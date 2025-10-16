@@ -1,4 +1,4 @@
-package com.team_seven.hotel_reservation_system.repository;
+package com.team_seven.hotel_reservation_system.models;
 
 import jakarta.persistence.*;
 import lombok.Data;

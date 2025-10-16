@@ -3,17 +3,17 @@ version: "3.8"
 services:
   # The PostgreSQL Database Service
   db:
-    image: postgres:15
+    image: postgres:17
     container_name: hotel_db
     restart: always
     environment:
-      - POSTGRES_USER=
-      - POSTGRES_PASSWORD=
-      - POSTGRES_DB=
+      - POSTGRES_USER=${LOCAL_DB_USER}
+      - POSTGRES_PASSWORD=${LOCAL_DB_PASSWORD}
+      - POSTGRES_DB=${LOCAL_DB_NAME}
     volumes:
-      - ./pgdata:/var/lib/postgresql/data
+      - db-data:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      - "${LOCAL_DB_PORT}:5432"
     networks:
       - hotel-network
   backend:
@@ -26,9 +26,9 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - SPRING_DATASOURCE_URL=
-      - SPRING_DATASOURCE_USERNAME=
-      - SPRING_DATASOURCE_PASSWORD=
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/${LOCAL_DB_NAME}
+      - SPRING_DATASOURCE_USERNAME=${LOCAL_DB_USER}
+      - SPRING_DATASOURCE_PASSWORD=${LOCAL_DB_PASSWORD}
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
     networks:
       - hotel-network
@@ -45,6 +45,8 @@ services:
     networks:
       - hotel-network
 
+volumes:
+  db-data:
 networks:
   hotel-network:
     driver: bridge

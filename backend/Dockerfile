@@ -8,7 +8,7 @@ WORKDIR /app
 # Copy the pom.xml first to leverage Docker's layer caching.
 # If pom.xml doesn't change, dependencies won't be re-downloaded.
 COPY pom.xml .
-RUN mvn depedency:go-offline
+RUN mvn dependency:go-offline
 
 # Copy the rest of the source code
 COPY src ./src
