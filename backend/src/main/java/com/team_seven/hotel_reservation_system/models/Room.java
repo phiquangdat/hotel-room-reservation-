@@ -1,4 +1,4 @@
-package com.team_seven.hotel_reservation_system.model;
+package com.team_seven.hotel_reservation_system.models;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

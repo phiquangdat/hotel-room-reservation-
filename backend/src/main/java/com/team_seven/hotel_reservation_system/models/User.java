@@ -1,6 +1,7 @@
-package com.team_seven.hotel_reservation_system.model;
+package com.team_seven.hotel_reservation_system.models;
 
 import jakarta.persistence.*;
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 

@@ -1,8 +1,8 @@
 package com.team_seven.hotel_reservation_system.service;
 
 import com.team_seven.hotel_reservation_system.dto.UserRegisterRequest;
-import com.team_seven.hotel_reservation_system.model.User;
-import com.team_seven.hotel_reservation_system.repository.UserRepository;
+import com.team_seven.hotel_reservation_system.models.User;
+import com.team_seven.hotel_reservation_system.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

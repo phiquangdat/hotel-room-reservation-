@@ -1,8 +1,8 @@
 package com.team_seven.hotel_reservation_system.service.impl;
 
 import com.team_seven.hotel_reservation_system.dto.RoomDto;
-import com.team_seven.hotel_reservation_system.model.Room;
-import com.team_seven.hotel_reservation_system.repository.RoomRepository;
+import com.team_seven.hotel_reservation_system.models.Room;
+import com.team_seven.hotel_reservation_system.repositories.RoomRepository;
 import com.team_seven.hotel_reservation_system.service.RoomService;
 import org.springframework.stereotype.Service;
 

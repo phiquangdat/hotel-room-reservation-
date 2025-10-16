@@ -24,7 +24,7 @@ db/snapshot:
 		--network=host \
 		-e PGPASSWORD=$(REMOTE_DB_PASSWORD) \
 		-v "$(CURRENT_DIR)":/backups \
-		postgres:16 \
+		postgres:17 \
 		pg_dump -h $(REMOTE_DB_HOST) -p $(REMOTE_DB_PORT) -U $(REMOTE_DB_USER) -F c -b -v -f /backups/$(BACKUP_FILE) $(REMOTE_DB_NAME)
 	@echo "--> Snapshot saved to $(BACKUP_FILE)"
 
@@ -35,7 +35,7 @@ db/restore:
 		--network=host \
 		-e PGPASSWORD=$(LOCAL_DB_PASSWORD) \
 		-v "$(CURRENT_DIR)":/backups \
-		postgres:16 \
+		postgres:17 \
 		pg_restore --no-owner --no-privileges -h $(LOCAL_DB_HOST) -p $(LOCAL_DB_PORT) -U $(LOCAL_DB_USER) -d $(LOCAL_DB_NAME) -v /backups/$(BACKUP_FILE) || true
 	@echo "--> Restore complete."
 
@@ -43,13 +43,13 @@ db/restore:
 db/recreate: db/snapshot
 	@echo "--> Recreating local database..."
 	# Terminate any active connections to the local database
-	@docker run --rm --network=host -e PGPASSWORD=$(LOCAL_DB_PASSWORD) postgres:16 \
+	@docker run --rm --network=host -e PGPASSWORD=$(LOCAL_DB_PASSWORD) postgres:17 \
 		psql -h $(LOCAL_DB_HOST) -p $(LOCAL_DB_PORT) -U $(LOCAL_DB_USER) -d postgres -c "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname='$(LOCAL_DB_NAME)';" || true
 	# Drop the local database if it exists
-	@docker run --rm --network=host -e PGPASSWORD=$(LOCAL_DB_PASSWORD) postgres:16 \
+	@docker run --rm --network=host -e PGPASSWORD=$(LOCAL_DB_PASSWORD) postgres:17 \
 		psql -h $(LOCAL_DB_HOST) -p $(LOCAL_DB_PORT) -U $(LOCAL_DB_USER) -d postgres -c "DROP DATABASE IF EXISTS $(LOCAL_DB_NAME);" || true
 	# Create a fresh local database
-	@docker run --rm --network=host -e PGPASSWORD=$(LOCAL_DB_PASSWORD) postgres:16 \
+	@docker run --rm --network=host -e PGPASSWORD=$(LOCAL_DB_PASSWORD) postgres:17 \
 		psql -h $(LOCAL_DB_HOST) -p $(LOCAL_DB_PORT) -U $(LOCAL_DB_USER) -d postgres -c "CREATE DATABASE $(LOCAL_DB_NAME);" || true
 	# Restore the snapshot
 	$(MAKE) db/restore
