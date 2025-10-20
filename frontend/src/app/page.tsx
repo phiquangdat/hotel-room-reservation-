@@ -1,6 +1,7 @@
 "use client";
 
 import { Search, MapPin, Calendar } from "lucide-react";
+import SearchBar from "../components/SearchBar";
 
 export default function Home() {
   return (
@@ -31,7 +32,11 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="py-16 bg-gray-50">
+      <div className="relative -mt-20 z-20 flex justify-center px-4">
+        <SearchBar />
+      </div>
+
+      <div className="py-16 bg-gray-50 text-black">
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="text-center p-6">
