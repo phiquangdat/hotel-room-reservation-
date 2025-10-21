@@ -1,7 +1,20 @@
 stages:
   - build
+  - test
 
-backend-build:
+build-frontend:
+  stage: build
+  image: node:20
+  script:
+    - echo "Building the Next.js application"
+    - cd frontend
+    - npm install
+    - npm run build
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH == "main"'
+
+build-backend:
   stage: build
   image: maven:3.9.6-eclipse-temurin-21
   script:
