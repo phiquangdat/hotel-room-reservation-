@@ -1,0 +1,10 @@
+stages:
+  - build
+
+backend-build:
+  stage: build
+  image: maven:3.9.6-eclipse-temurin-21
+  script:
+    - echo "Building the Spring Boot Application"
+    - cd backend
+    - mvn package -DskipTests
