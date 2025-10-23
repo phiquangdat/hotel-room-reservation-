@@ -1,10 +1,10 @@
-package com.team_seven.hotel_reservation_system.repositories;
+package com.team_seven.hotel_reservation_system.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.math.Decimal;
+import java.math.BigDecimal;
 
 @Data
 @NoArgsConstructor

@@ -19,7 +19,7 @@ public class PublicRoomController {
 
     @GetMapping("/search")
     public ResponseEntity<List<RoomSearchResultDto>> searchRooms(
-        @RequestParam String city;
+        @RequestParam String city,
         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkInDate,
         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkOutDate,
         @RequestParam Integer guestCapacity

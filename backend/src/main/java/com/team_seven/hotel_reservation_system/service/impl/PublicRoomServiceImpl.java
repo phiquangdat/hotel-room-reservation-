@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,12 +20,12 @@ public class PublicRoomServiceImpl implements PublicRoomService {
         private RoomRepository roomRepository;
 
         @Override
-        public List<RoomSearchResultDto> findAvailableRooms(String city;
-        LocalDate checkInDate;
-        LocalDate checkOutDate;
+        public List<RoomSearchResultDto> findAvailableRooms(String city,
+        LocalDate checkInDate,
+        LocalDate checkOutDate,
         Integer guestCapacity){
                 List<Room> foundRooms = roomRepository.findAvailableRoomsByCityAndCapacity(
-                        city.LowerCase(),
+                        city.toLowerCase(),
                         guestCapacity
                 );
 
