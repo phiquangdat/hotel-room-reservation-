@@ -1,4 +1,4 @@
-package com.team_seven.hotel_reservation_system;
+package com.team_seven.hotel_reservation_system.controller;
 
 import com.team_seven.hotel_reservation_system.dto.UserRegisterRequest;
 import com.team_seven.hotel_reservation_system.service.UserService;

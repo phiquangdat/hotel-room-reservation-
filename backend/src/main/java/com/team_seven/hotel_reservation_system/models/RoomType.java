@@ -16,25 +16,32 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 @Entity
-@Table(name = "rooms")
+@Table(name = "room_types")
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Room {
-
+public class RoomType {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "room_type_id", nullable = false)
-    private RoomType roomType;
+    @JoinColumn(name = "hotel_id", nullable = false)
+    private Hotel hotel;
 
-    @Column(length = 20, nullable = false)
-    private String roomNumber;
-    
-    @Column(length = 20, nullable = false)
-    private String status;
+    @Column(length = 100, nullable = false)
+    private String name;
+
+    @Lob
+    private String description;
+
+    @Column(precision = 10, scale = 2, nullable = false)
+    private BigDecimal pricePerNight;
+
+    @Column(nullable = false)
+    private Integer capacity;
 }
