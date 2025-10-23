@@ -1,49 +1,48 @@
 package com.team_seven.hotel_reservation_system.service.impl;
 
-import com.team_seven.hotel_reservation_system.dto.RoomDto;
+import com.team_seven.hotel_reservation_system.dto.RoomSearchResultDto;
 import com.team_seven.hotel_reservation_system.models.Hotel;
 import com.team_seven.hotel_reservation_system.models.Room;
 import com.team_seven.hotel_reservation_system.repositories.HotelRepository;
 import com.team_seven.hotel_reservation_system.repositories.RoomRepository;
 import com.team_seven.hotel_reservation_system.service.PublicRoomService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 public class PublicRoomServiceImpl implements PublicRoomService {
+        @Autowired
+        private RoomRepository roomRepository;
 
-    private final HotelRepository hotelRepository;
-    private final RoomRepository roomRepository;
+        @Override
+        public List<RoomSearchResultDto> findAvailableRooms(String city;
+        LocalDate checkInDate;
+        LocalDate checkOutDate;
+        Integer guestCapacity){
+                List<Room> foundRooms = roomRepository.findAvailableRoomsByCityAndCapacity(
+                        city.LowerCase(),
+                        guestCapacity
+                );
 
-    public PublicRoomServiceImpl(HotelRepository hotelRepository, RoomRepository roomRepository) {
-        this.hotelRepository = hotelRepository;
-        this.roomRepository = roomRepository;
-    }
+                return foundRooms.stream().map(this::mapToDto).collect(Collectors.toList());
+        }
 
-    @Override
-    public List<RoomDto> searchRooms(String city, int guests) {
-        List<Hotel> hotelsInCity = hotelRepository.findAll()
-                .stream()
-                .filter(h -> h.getCity() != null && h.getCity().equalsIgnoreCase(city))
-                .collect(Collectors.toList());
+        private RoomSearchResultDto mapToDto(Room room) {
+                String imageUrl = "https://images.unsplash.com/photo-1611892440504-42a792e24d32?q=80&w=2070&auto=format&fit=crop"; 
 
-        List<Room> allRooms = roomRepository.findAll();
-
-        List<Room> filtered = allRooms.stream()
-                .filter(Room::getAvailable)
-                .collect(Collectors.toList());
-
-
-        return filtered.stream()
-                .map(r -> new RoomDto(
-                        r.getId(),
-                        r.getNumber(),
-                        r.getType(),
-                        r.getPrice(),
-                        r.getAvailable()
-                ))
-                .collect(Collectors.toList());
-    }
+                return new RoomSearchResultDto(
+                        room.getId(),
+                        imageUrl,
+                        room.getRoomType().getHotel().getName(),
+                        room.getRoomType().getName(),
+                        room.getRoomType().getPricePerNight(),
+                        room.getRoomType().getCapacity(),
+                        room.getRoomNumber(),
+                        room.getStatus()
+                );
+        }
 }
