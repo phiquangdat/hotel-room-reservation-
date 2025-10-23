@@ -1,7 +1,37 @@
 "use client";
 
-import { Search, MapPin, Calendar } from "lucide-react";
 import SearchBar from "../components/SearchBar";
+import RoomCard, { RoomCardProps } from "@/components/RoomCard";
+
+const featuredRooms: RoomCardProps[] = [
+  {
+    id: "1",
+    imageUrl:
+      "https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=2070&auto=format&fit=crop",
+    hotelName: "Scandic Waskia",
+    roomType: "Standard Queen Room",
+    pricePerNight: 125,
+    capacity: 2,
+  },
+  {
+    id: "2",
+    imageUrl:
+      "https://images.unsplash.com/photo-1611892440504-42a792e24d32?q=80&w=2070&auto=format&fit=crop",
+    hotelName: "Original Sokos Hotel Royal",
+    roomType: "Superior King Room",
+    pricePerNight: 160,
+    capacity: 2,
+  },
+  {
+    id: "3",
+    imageUrl:
+      "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=2070&auto=format&fit=crop", // Stylish Resort Room
+    hotelName: "Hotel Astor",
+    roomType: "Junior Suite with Sea View",
+    pricePerNight: 195,
+    capacity: 3,
+  },
+];
 
 export default function Home() {
   return (
@@ -39,35 +69,9 @@ export default function Home() {
       <div className="py-16 bg-gray-50 text-black">
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center p-6">
-              <div className="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Search className="h-8 w-8 text-indigo-600" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Easy Search</h3>
-              <p className="text-gray-600">
-                Find your perfect hotel in seconds with our intuitive search
-              </p>
-            </div>
-
-            <div className="text-center p-6">
-              <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <MapPin className="h-8 w-8 text-purple-600" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Best Locations</h3>
-              <p className="text-gray-600">
-                Access thousands of hotels in prime locations worldwide
-              </p>
-            </div>
-
-            <div className="text-center p-6">
-              <div className="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Calendar className="h-8 w-8 text-indigo-600" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Flexible Booking</h3>
-              <p className="text-gray-600">
-                Book with confidence with flexible cancellation options
-              </p>
-            </div>
+            {featuredRooms.map((room) => (
+              <RoomCard key={room.id} {...room} />
+            ))}
           </div>
         </div>
       </div>
