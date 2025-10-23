@@ -6,6 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="47d7a693-6327-4989-b833-9a88aa8f0102" name="Changes" comment="add searchController">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/team_seven/hotel_reservation_system/controller/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/team_seven/hotel_reservation_system/controller/UserController.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -114,7 +115,7 @@
       <workItem from="1761077123581" duration="79000" />
       <workItem from="1761115011900" duration="2354000" />
       <workItem from="1761117524647" duration="2535000" />
-      <workItem from="1761122160009" duration="40239000" />
+      <workItem from="1761122160009" duration="42520000" />
     </task>
     <task id="LOCAL-00001" summary="add searchController">
       <option name="closed" value="true" />
