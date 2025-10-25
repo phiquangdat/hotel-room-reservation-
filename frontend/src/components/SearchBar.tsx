@@ -6,8 +6,8 @@ import { Calendar, MapPin, User, Search } from "lucide-react";
 
 export default function SearchBar() {
   const [city, setCity] = useState<string>("Vaasa");
-  const [checkIn, setCheckIn] = useState<string>("");
-  const [checkOut, setCheckout] = useState<string>("");
+  const [checkInDate, setCheckInDate] = useState<string>("");
+  const [checkOutDate, setCheckoutDate] = useState<string>("");
   const [guests, setGuests] = useState<number>(2);
 
   const router = useRouter();
@@ -17,8 +17,8 @@ export default function SearchBar() {
 
     const query = new URLSearchParams({
       city,
-      checkIn,
-      checkOut,
+      checkInDate,
+      checkOutDate,
       guests: guests.toString(),
     });
 
@@ -47,8 +47,8 @@ export default function SearchBar() {
           <Calendar className="w-5 h-5 text-gray-400 mr-2" />
           <input
             type="date"
-            value={checkIn}
-            onChange={(e) => setCheckIn(e.target.value)}
+            value={checkInDate}
+            onChange={(e) => setCheckInDate(e.target.value)}
             className="w-full p-2 outline-none bg-transparent text-gray-500"
             required
           />
@@ -58,8 +58,8 @@ export default function SearchBar() {
           <Calendar className="h-5 w-5 text-gray-400" />
           <input
             type="date"
-            value={checkOut}
-            onChange={(e) => setCheckout(e.target.value)}
+            value={checkOutDate}
+            onChange={(e) => setCheckoutDate(e.target.value)}
             className="w-full p-2 outline-none bg-transparent text-gray-500"
             required
           />
