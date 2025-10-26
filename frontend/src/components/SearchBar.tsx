@@ -8,7 +8,7 @@ export default function SearchBar() {
   const [city, setCity] = useState<string>("Vaasa");
   const [checkInDate, setCheckInDate] = useState<string>("");
   const [checkOutDate, setCheckoutDate] = useState<string>("");
-  const [guestCapacity, setGuestCapacity] = useState<number>(2);
+  const [guestCapacity, setGuestCapacity] = useState<number>(0);
 
   const router = useRouter();
 
