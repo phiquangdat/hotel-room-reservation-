@@ -25,7 +25,7 @@ const featuredRooms: RoomCardProps[] = [
   {
     id: "3",
     imageUrl:
-      "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=2070&auto=format&fit=crop", // Stylish Resort Room
+      "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=2070&auto=format&fit=crop",
     hotelName: "Hotel Astor",
     roomType: "Junior Suite with Sea View",
     pricePerNight: 195,
