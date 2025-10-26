@@ -22,7 +22,7 @@ public class PublicRoomController {
         @RequestParam String city,
         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkInDate,
         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkOutDate,
-        @RequestParam Integer guestCapacity
+        @RequestParam int guestCapacity
     ) {
         List<RoomSearchResultDto> rooms = publicRoomService.findAvailableRooms(
             city, checkInDate, checkOutDate, guestCapacity

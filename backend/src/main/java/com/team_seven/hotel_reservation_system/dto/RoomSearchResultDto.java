@@ -11,11 +11,10 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class RoomSearchResultDto {
     private Long roomId;
-    private String imageUrl;
     private String hotelName;
+    private String city;
     private String roomType;
+    private String imageUrl;
     private BigDecimal pricePerNight;
     private Integer capacity;
-    private String roomNumber;
-    private String roomStatus;
 }

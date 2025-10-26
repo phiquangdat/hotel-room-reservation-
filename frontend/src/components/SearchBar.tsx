@@ -8,7 +8,7 @@ export default function SearchBar() {
   const [city, setCity] = useState<string>("Vaasa");
   const [checkInDate, setCheckInDate] = useState<string>("");
   const [checkOutDate, setCheckoutDate] = useState<string>("");
-  const [guests, setGuests] = useState<number>(2);
+  const [guestCapacity, setGuestCapacity] = useState<number>(2);
 
   const router = useRouter();
 
@@ -19,7 +19,7 @@ export default function SearchBar() {
       city,
       checkInDate,
       checkOutDate,
-      guests: guests.toString(),
+      guestCapacity: guestCapacity.toString(),
     });
 
     router.push(`/search?${query.toString()}`);
@@ -70,8 +70,8 @@ export default function SearchBar() {
           <input
             type="number"
             min="1"
-            value={guests}
-            onChange={(e) => setGuests(Number(e.target.value))}
+            value={guestCapacity}
+            onChange={(e) => setGuestCapacity(Number(e.target.value))}
             className="w-full p-2 outline-none bg-transparent text-black"
             required
           />
