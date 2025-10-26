@@ -9,6 +9,6 @@ public interface PublicRoomService {
         String city,
         LocalDate checkInDate,
         LocalDate checkOutDate,
-        Integer guestCapacity
+        int guestCapacity
     );
 }

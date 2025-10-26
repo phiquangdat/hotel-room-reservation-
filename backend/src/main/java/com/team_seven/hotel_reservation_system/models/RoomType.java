@@ -36,6 +36,9 @@ public class RoomType {
     @Column(length = 100, nullable = false)
     private String name;
 
+    @Column(name = "image_url")
+    private String imageUrl;
+
     @Lob
     private String description;
 
