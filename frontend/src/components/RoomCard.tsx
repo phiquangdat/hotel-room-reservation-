@@ -56,9 +56,6 @@ export default function RoomCard({
                 / night
               </span>
             </p>
-            <span className="text-sm font-medium text-white bg-indigo-600 px-3 py-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              View Details
-            </span>
           </div>
         </div>
       </div>

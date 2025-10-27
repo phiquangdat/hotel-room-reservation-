@@ -1,39 +1,23 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import SearchBar from "../components/SearchBar";
-import RoomCard, { RoomCardProps } from "@/components/RoomCard";
-
-const featuredRooms: RoomCardProps[] = [
-  {
-    id: "1",
-    imageUrl:
-      "https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=2070&auto=format&fit=crop",
-    hotelName: "Scandic Waskia",
-    roomType: "Standard Queen Room",
-    pricePerNight: 125,
-    capacity: 2,
-  },
-  {
-    id: "2",
-    imageUrl:
-      "https://images.unsplash.com/photo-1611892440504-42a792e24d32?q=80&w=2070&auto=format&fit=crop",
-    hotelName: "Original Sokos Hotel Royal",
-    roomType: "Superior King Room",
-    pricePerNight: 160,
-    capacity: 2,
-  },
-  {
-    id: "3",
-    imageUrl:
-      "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=2070&auto=format&fit=crop",
-    hotelName: "Hotel Astor",
-    roomType: "Junior Suite with Sea View",
-    pricePerNight: 195,
-    capacity: 3,
-  },
-];
+import { fetchTopHotels, type Hotel } from "@/lib/actions";
 
 export default function Home() {
+  const [featuredRooms, setFeaturedRooms] = useState<Hotel[]>([]);
+
+  useEffect(() => {
+    async function loadHotels() {
+      try {
+        const data: Hotel[] = await fetchTopHotels();
+        setFeaturedRooms(data);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+    loadHotels();
+  }, []);
   return (
     <div>
       <div className="relative h-[70vh] min-h-[500px] overflow-hidden">
@@ -69,9 +53,20 @@ export default function Home() {
       <div className="py-16 bg-gray-50 text-black">
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {featuredRooms.map((room) => (
-              <RoomCard key={room.id} {...room} />
-            ))}
+            <h2>⭐ Top Rated Hotels</h2>
+            {featuredRooms.length > 0 ? (
+              <ul>
+                {featuredRooms.map((hotel) => (
+                  <li key={hotel.id}>
+                    <strong>{hotel.name}</strong> ({hotel.rating} stars)
+                    <br />
+                    <small>{hotel.city}</small>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p>No rated hotels found.</p>
+            )}
           </div>
         </div>
       </div>
