@@ -10,24 +10,27 @@ import java.math.BigDecimal;
 @Entity
 @Table(name = "hotels")
 public class Hotel {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
-    @Column(nullable = false)
+    @Column(name = "name", nullable = false)
     private String name;
 
+    @Column(name = "address")
     private String address;
 
-    @Column(length = 100)
+    @Column(name = "city", length = 100)
     private String city;
 
-    @Column(length = 20)
+    @Column(name = "phone_number", length = 20)
     private String phoneNumber;
 
-    @Lob
+    @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
-    @Column(precision = 2, scale = 1)
+    @Column(name = "rating", precision = 3, scale = 1)
     private BigDecimal rating;
 }

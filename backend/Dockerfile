@@ -14,7 +14,7 @@ RUN mvn dependency:go-offline
 COPY src ./src
 
 # Package the application, skipping the tests
-RUN mvn package -DskipTests
+RUN mvn clean package -DskipTests
 
 # --- Stage 2: Create the final, slim image ---
 FROM eclipse-temurin:21-jre-jammy

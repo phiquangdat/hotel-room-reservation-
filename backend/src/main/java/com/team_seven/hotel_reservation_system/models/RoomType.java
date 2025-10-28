@@ -39,7 +39,7 @@ public class RoomType {
     @Column(name = "image_url")
     private String imageUrl;
 
-    @Lob
+    @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
     @Column(precision = 10, scale = 2, nullable = false)
