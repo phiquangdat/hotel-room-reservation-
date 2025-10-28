@@ -1,32 +1,52 @@
+"use client";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { RoomCardProps } from "@/lib/actions";
+import type { MouseEvent } from "react";
 import { Users } from "lucide-react";
 
-export interface RoomCardProps {
-  id: string;
-  imageUrl: string;
-  hotelName: string;
-  roomType: string;
-  pricePerNight: number;
-  capacity: number;
-}
-
 export default function RoomCard({
-  id,
+  roomId,
   imageUrl,
   hotelName,
-  roomType,
+  roomTypeName,
   pricePerNight,
   capacity,
 }: RoomCardProps) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const handleReserveClick = (e: MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const bookingParams = new URLSearchParams();
+
+    const checkInDate = searchParams.get("checkInDate");
+    const checkOutDate = searchParams.get("checkOutDate");
+    const guests = searchParams.get("guestCapacity");
+
+    if (checkInDate) {
+      bookingParams.append("checkInDate", checkInDate);
+    }
+    if (checkOutDate) {
+      bookingParams.append("checkOutDate", checkOutDate);
+    }
+    if (guests) {
+      bookingParams.append("guests", guests);
+    }
+
+    router.push(`/booking/${roomId}?${bookingParams.toString()}`);
+  };
   return (
-    <Link href={`/rooms/${id}`} className="group block">
+    <Link href={`/rooms/${roomId}`} className="group block">
       <div className="bg-white rounded-lg shadow-md overflow-hidden transition-all duration-300 ease-in-out hover:shadow-xl group-hover:scale-[1.03]">
         <div className="relative h-52 w-full">
           {" "}
           <Image
             src={imageUrl}
-            alt={`Photo of ${roomType} at ${hotelName}`}
+            alt={`Photo of ${roomTypeName} at ${hotelName}`}
             fill
             style={{ objectFit: "cover" }}
             className="transition-opacity duration-300 group-hover:opacity-85"
@@ -40,7 +60,7 @@ export default function RoomCard({
             {hotelName}
           </p>
           <h3 className="text-md font-semibold text-gray-800 truncate mt-1">
-            {roomType}
+            {roomTypeName}
           </h3>
 
           <div className="flex items-center text-gray-600 mt-2">
@@ -56,6 +76,15 @@ export default function RoomCard({
                 / night
               </span>
             </p>
+          </div>
+
+          <div className="mt-4">
+            <button
+              className="relative z-10 w-full text-center px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md shadow-sm hover:bg-indigo-700 transition-colors ease-in-out duration-150 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+              onClick={handleReserveClick}
+            >
+              Reserve
+            </button>
           </div>
         </div>
       </div>

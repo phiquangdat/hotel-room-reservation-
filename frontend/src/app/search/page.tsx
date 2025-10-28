@@ -1,4 +1,5 @@
-import RoomCard, { RoomCardProps } from "@/components/RoomCard";
+import RoomCard from "@/components/RoomCard";
+import { RoomCardProps } from "@/lib/actions";
 import { ServerCrash, Search, Calendar, Users } from "lucide-react";
 import { searchRooms } from "@/lib/actions";
 
@@ -52,7 +53,7 @@ async function SearchResults({ searchParams }: SearchPageProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {rooms.map((room) => (
-        <RoomCard key={room.id} {...room} />
+        <RoomCard key={room.roomId} {...room} />
       ))}
     </div>
   );

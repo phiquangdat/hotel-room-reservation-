@@ -1,7 +1,6 @@
 package com.team_seven.hotel_reservation_system.dto;
 
 import java.math.BigDecimal;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,9 +12,10 @@ import lombok.Builder;
 @Builder
 public class RoomDto {
     private Long id;
-    private Long roomTypeId;
     private String roomNumber;
-    private String roomTypeName;
+    private Long roomTypeId;      
+    private String roomTypeName;    
+    private String imageUrl;
     private BigDecimal pricePerNight;
     private String status;
     private Integer capacity;

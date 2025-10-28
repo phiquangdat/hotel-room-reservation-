@@ -1,6 +1,7 @@
 package com.team_seven.hotel_reservation_system.service.impl;
 
 import com.team_seven.hotel_reservation_system.dto.RoomDto;
+import com.team_seven.hotel_reservation_system.models.Hotel; 
 import com.team_seven.hotel_reservation_system.models.Room;
 import com.team_seven.hotel_reservation_system.models.RoomType;
 import com.team_seven.hotel_reservation_system.repositories.RoomRepository;
@@ -26,18 +27,22 @@ public class RoomServiceImpl implements RoomService {
         this.roomTypeRepository = roomTypeRepository;
     }
 
+    // Updated to map to the modified RoomDto
     private RoomDto toDto(Room r) {
         if (r == null) return null;
-        RoomType roomType = r.getRoomType();
+        RoomType roomType = r.getRoomType(); 
+        Hotel hotel = (roomType != null) ? roomType.getHotel() : null; 
+
         return RoomDto.builder()
                 .id(r.getId())
                 .roomNumber(r.getRoomNumber())
-                .roomTypeId(roomType != null ? roomType.getId(): null)
-                .roomTypeName(roomType != null ? roomType.getName(): "N/A")
-                .pricePerNight(roomType != null ? roomType.getPricePerNight(): null)
+                .roomTypeId(roomType != null ? roomType.getId() : null)
+                .roomTypeName(roomType != null ? roomType.getName() : "N/A") 
+                .imageUrl(roomType != null ? roomType.getImageUrl() : null)
+                .pricePerNight(roomType != null ? roomType.getPricePerNight() : null)
                 .status(r.getStatus())
-                .capacity(roomType != null ? roomType.getCapacity(): null)
-                .hotelName(roomType != null && roomType.getHotel() != null ? roomType.getHotel().getName(): "N/A")
+                .capacity(roomType != null ? roomType.getCapacity() : null)
+                .hotelName(hotel != null ? hotel.getName() : "N/A") 
                 .build();
     }
 
@@ -45,10 +50,15 @@ public class RoomServiceImpl implements RoomService {
         if (d == null) return null;
 
         RoomType roomType = roomTypeRepository.findById(d.getRoomTypeId())
-                                                .orElseThrow(() -> new EntityNotFoundException("RoomType not found with ID: " + d.getRoomTypeId()));
+                .orElseThrow(() -> new EntityNotFoundException("RoomType not found with ID: " + d.getRoomTypeId()));
 
+        Room room = new Room();
+        room.setId(d.getId()); 
+        room.setRoomNumber(d.getRoomNumber());
+        room.setRoomType(roomType);
+        room.setStatus(d.getStatus());
         return Room.builder()
-                .id(d.getId())
+                .id(d.getId()) 
                 .roomNumber(d.getRoomNumber())
                 .roomType(roomType)
                 .status(d.getStatus())
@@ -56,22 +66,28 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
+    @Transactional 
     public RoomDto create(RoomDto dto) {
-        dto.setId(null);
-        Room saved = roomRepository.save(toEntity(dto));
+        dto.setId(null); 
+        Room roomToSave = toEntity(dto);
+        Room saved = roomRepository.save(roomToSave);
         return toDto(saved);
     }
 
     @Override
     @Transactional(readOnly = true)
     public RoomDto getById(Long id) {
-        return roomRepository.findById(id).map(this::toDto).orElseThrow(() -> new EntityNotFoundException("Room not found with ID: " + id));
+        return roomRepository.findById(id)
+                .map(this::toDto) 
+                .orElseThrow(() -> new EntityNotFoundException("Room not found with ID: " + id));
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<RoomDto> getAll() {
-        return roomRepository.findAll().stream().map(this::toDto).collect(Collectors.toList());
+        return roomRepository.findAll().stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
     }
 
     @Override

@@ -1,7 +1,6 @@
 version: "3.8"
 
 services:
-  # The PostgreSQL Database Service
   db:
     image: postgres:17
     container_name: hotel_db
