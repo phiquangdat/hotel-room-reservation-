@@ -1,5 +1,6 @@
 "use client";
 
+import { useSearchStore } from "@/lib/store";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Calendar, MapPin, User, Search } from "lucide-react";
@@ -11,9 +12,11 @@ export default function SearchBar() {
   const [guestCapacity, setGuestCapacity] = useState<number>(0);
 
   const router = useRouter();
+  const setSearchDates = useSearchStore((state) => state.setSearchDates);
 
   const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setSearchDates(checkInDate, checkOutDate, guestCapacity);
 
     const query = new URLSearchParams({
       city,

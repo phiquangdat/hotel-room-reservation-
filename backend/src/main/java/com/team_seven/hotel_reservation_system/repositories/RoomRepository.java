@@ -17,6 +17,7 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
     " rt.id, " +
     " rt.name, " +
     " rt.imageUrl, " +
+    " h.description, " + 
     " rt.pricePerNight, " +
     " r.status, " +
     " rt.capacity, " +

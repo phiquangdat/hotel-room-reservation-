@@ -18,15 +18,19 @@ export interface Hotel {
 }
 
 export interface BookingFormData {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phoneNumber: string;
+
   roomId: number;
-  customerId: number;
   checkInDate: string;
   checkOutDate: string;
   numberOfGuests: number;
 }
 
 export interface RoomCardProps {
-  roomId: string;
+  roomId: number;
   imageUrl: string;
   hotelName: string;
   roomTypeId: string;
@@ -102,13 +106,16 @@ export async function fetchRoomDetails(id: string): Promise<BookingRoomProps> {
     const res = await fetch(url, {
       cache: "no-store",
     });
-    console.log(res);
+
     if (!res.ok) {
       throw new Error(`API request failed with status ${res.status}`);
     }
     return await res.json();
   } catch (error) {
     console.error("Failed to fetch room details: ", error);
+    if (error instanceof Error) {
+      throw error;
+    }
     throw new Error("Could not fetch room data.");
   }
 }
@@ -131,9 +138,9 @@ export async function createBooking(formData: BookingFormData) {
     const newBooking = await res.json();
     return newBooking;
   } catch (err) {
-    if (err instanceof Error) throw new Error(err.message);
-    else {
-      throw new Error("Unknown error occurred");
+    if (err instanceof Error) {
+      return { error: err.message };
     }
+    return { error: "An unknown error occurred" };
   }
 }

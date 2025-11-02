@@ -1,9 +1,10 @@
 package com.team_seven.hotel_reservation_system.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
@@ -11,21 +12,28 @@ import java.time.LocalDate;
 
 @Entity
 @Table(name = "bookings")
-@Getter
-@Setter
-@NoArgsConstructor 
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Booking {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) 
     private Long id;
 
+    @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id", nullable = false) 
+    @ToString.Exclude 
+    @EqualsAndHashCode.Exclude 
     private Customer customer;
 
+    @JsonBackReference(value = "room-booking")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "room_id", nullable = false)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private Room room;
 
     @Column(name = "check_in_date")

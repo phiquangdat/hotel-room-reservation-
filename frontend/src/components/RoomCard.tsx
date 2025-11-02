@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { RoomCardProps } from "@/lib/actions";
 import type { MouseEvent } from "react";
 import { Users } from "lucide-react";
@@ -15,29 +15,12 @@ export default function RoomCard({
   capacity,
 }: RoomCardProps) {
   const router = useRouter();
-  const searchParams = useSearchParams();
 
   const handleReserveClick = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     e.stopPropagation();
 
-    const bookingParams = new URLSearchParams();
-
-    const checkInDate = searchParams.get("checkInDate");
-    const checkOutDate = searchParams.get("checkOutDate");
-    const guests = searchParams.get("guestCapacity");
-
-    if (checkInDate) {
-      bookingParams.append("checkInDate", checkInDate);
-    }
-    if (checkOutDate) {
-      bookingParams.append("checkOutDate", checkOutDate);
-    }
-    if (guests) {
-      bookingParams.append("guests", guests);
-    }
-
-    router.push(`/booking/${roomId}?${bookingParams.toString()}`);
+    router.push(`/booking/${roomId}`);
   };
   return (
     <Link href={`/rooms/${roomId}`} className="group block">

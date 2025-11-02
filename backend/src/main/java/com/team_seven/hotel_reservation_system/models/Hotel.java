@@ -3,7 +3,11 @@ package com.team_seven.hotel_reservation_system.models;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import java.math.BigDecimal;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -15,6 +19,12 @@ public class Hotel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
+    
+    @JsonManagedReference(value = "hotel-roomtype")
+    @OneToMany(mappedBy = "hotel", fetch = FetchType.LAZY)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private Set<RoomType> roomTypes;
 
     @Column(name = "name", nullable = false)
     private String name;

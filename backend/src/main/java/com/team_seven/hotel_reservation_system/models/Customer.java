@@ -1,7 +1,10 @@
 package com.team_seven.hotel_reservation_system.models;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import lombok.NoArgsConstructor;
 
 import java.util.Set;
@@ -28,7 +31,10 @@ public class Customer {
     @Column(name = "phone_number")
     private String phoneNumber;
 
+    @JsonManagedReference
     @OneToMany(mappedBy = "customer")
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private Set<Booking> bookings;
 
     @ManyToMany(fetch = FetchType.EAGER) 
@@ -37,6 +43,8 @@ public class Customer {
         joinColumns = @JoinColumn(name = "customer_id"),
         inverseJoinColumns = @JoinColumn(name = "role_id")
     )
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private Set<Role> roles;
 }
 

@@ -16,6 +16,7 @@ public class RoomDto {
     private Long roomTypeId;      
     private String roomTypeName;    
     private String imageUrl;
+    private String description;
     private BigDecimal pricePerNight;
     private String status;
     private Integer capacity;
