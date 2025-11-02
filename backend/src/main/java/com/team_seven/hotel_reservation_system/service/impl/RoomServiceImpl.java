@@ -27,7 +27,6 @@ public class RoomServiceImpl implements RoomService {
         this.roomTypeRepository = roomTypeRepository;
     }
 
-    // Updated to map to the modified RoomDto
     private RoomDto toDto(Room r) {
         if (r == null) return null;
         RoomType roomType = r.getRoomType(); 
@@ -39,6 +38,7 @@ public class RoomServiceImpl implements RoomService {
                 .roomTypeId(roomType != null ? roomType.getId() : null)
                 .roomTypeName(roomType != null ? roomType.getName() : "N/A") 
                 .imageUrl(roomType != null ? roomType.getImageUrl() : null)
+                .description(roomType != null ? roomType.getDescription() : null)
                 .pricePerNight(roomType != null ? roomType.getPricePerNight() : null)
                 .status(r.getStatus())
                 .capacity(roomType != null ? roomType.getCapacity() : null)
