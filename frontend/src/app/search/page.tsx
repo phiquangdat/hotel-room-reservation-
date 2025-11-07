@@ -2,7 +2,7 @@ import RoomCard from "@/components/RoomCard";
 import { RoomCardProps } from "@/lib/actions";
 import { ServerCrash, Search, Calendar, Users } from "lucide-react";
 import { searchRooms } from "@/lib/actions";
-
+// Search 7 Nov 2025
 interface SearchPageProps {
   searchParams: {
     city?: string;
