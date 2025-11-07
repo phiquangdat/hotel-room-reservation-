@@ -14,7 +14,8 @@ import java.net.URI;
 public class BookingController {
     @Autowired
     private BookingService bookingService;
-
+    // for test
+    int a = 1/0;
     @PostMapping
     public ResponseEntity<Booking> create(@RequestBody GuestBookingRequestDto bookingDto) {
         Booking newBooking = bookingService.createBooking(bookingDto);
