@@ -7,15 +7,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.net.URI;
-
+// 7.11
 @RestController
 @RequestMapping("/api/bookings")
 @CrossOrigin(origins = "*")
 public class BookingController {
     @Autowired
     private BookingService bookingService;
-    // for test
-    int a = 1/0;
     @PostMapping
     public ResponseEntity<Booking> create(@RequestBody GuestBookingRequestDto bookingDto) {
         Booking newBooking = bookingService.createBooking(bookingDto);
