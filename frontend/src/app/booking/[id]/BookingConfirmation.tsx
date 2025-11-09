@@ -40,7 +40,7 @@ export default function BookingConfirmation(room: BookingRoomProps) {
 
   const numberOfNights = calculateNights(checkInDate, checkOutDate);
   const totalPrice = (numberOfNights * room.pricePerNight).toFixed(2);
-  const roomId = (room as any).id ?? (room as any).roomId;
+  const roomId = "roomId" in room ? room.roomId : 0;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -5,13 +5,11 @@ import BookingConfirmation from "./BookingConfirmation";
 import { MapPin, Users, Bed, Wifi, Tv } from "lucide-react";
 
 interface BookingPageProps {
-  params: {
-    id: string;
-  };
+  params: Promise<{ id: string }>;
 }
 
 export default async function BookingPage({ params }: BookingPageProps) {
-  const roomId = params.id;
+  const { id: roomId } = await params;
   let room;
   try {
     room = await fetchRoomDetails(roomId);
@@ -38,7 +36,11 @@ export default async function BookingPage({ params }: BookingPageProps) {
             <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
               <div className="relative w-full h-64 sm:h-80 lg:h-96">
                 <Image
-                  src={room.imageUrl}
+                  src={
+                    room.imageUrl?.startsWith("http")
+                      ? room.imageUrl
+                      : "https://via.placeholder.com/1200x800?text=No+Image+Available"
+                  }
                   alt={room.roomTypeName}
                   fill
                   className="object-cover"

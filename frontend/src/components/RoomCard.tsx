@@ -1,10 +1,11 @@
 "use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { RoomCardProps } from "@/lib/actions";
 import type { MouseEvent } from "react";
 import { Users } from "lucide-react";
+import type { RoomCardProps } from "@/lib/actions";
 
 export default function RoomCard({
   roomId,
@@ -19,22 +20,24 @@ export default function RoomCard({
   const handleReserveClick = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     e.stopPropagation();
-
     router.push(`/booking/${roomId}`);
   };
+
   return (
-    <Link href={`/rooms/${roomId}`} className="group block">
+    <Link
+      href={`/rooms/${roomId}`}
+      className="group block focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded-lg"
+    >
       <div className="bg-white rounded-lg shadow-md overflow-hidden transition-all duration-300 ease-in-out hover:shadow-xl group-hover:scale-[1.03]">
         <div className="relative h-52 w-full">
-          {" "}
           <Image
-            src={imageUrl}
+            src={imageUrl || "/placeholder-room.jpg"}
             alt={`Photo of ${roomTypeName} at ${hotelName}`}
             fill
             style={{ objectFit: "cover" }}
             className="transition-opacity duration-300 group-hover:opacity-85"
             placeholder="blur"
-            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkqAcAAIUAgUW0RjgAAAAASUVORK5CYII=" // Tiny transparent blur placeholder
+            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkqAcAAIUAgUW0RjgAAAAASUVORK5CYII="
           />
         </div>
 
