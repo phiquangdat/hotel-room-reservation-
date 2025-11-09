@@ -46,5 +46,4 @@ test-backend:
   script:
     - echo "Running Spring Boot unit tests"
     - cd backend
-    - mvn test
-
+    - mvn clean test

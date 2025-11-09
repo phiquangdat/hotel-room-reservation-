@@ -1,7 +1,7 @@
 import RoomCard from "@/components/RoomCard";
 import { RoomCardProps } from "@/lib/actions";
 import { ServerCrash, Search, Calendar, Users } from "lucide-react";
-import { searchRooms } from "@/lib/actions";
+import { searchRooms, type SearchParams } from "@/lib/actions";
 // Search 7 Nov 2025
 interface SearchPageProps {
   searchParams: {
@@ -15,8 +15,15 @@ interface SearchPageProps {
 async function SearchResults({ searchParams }: SearchPageProps) {
   let rooms: RoomCardProps[] = [];
 
+  const queryParams: SearchParams = {
+    city: searchParams.city,
+    checkInDate: searchParams.checkInDate,
+    checkOutDate: searchParams.checkOutDate,
+    guestCapacity: searchParams.guestCapacity,
+  };
+
   try {
-    rooms = await searchRooms(searchParams);
+    rooms = await searchRooms(queryParams);
   } catch (error) {
     console.error("Failed to fetch search results:", error);
     return (
@@ -60,7 +67,10 @@ async function SearchResults({ searchParams }: SearchPageProps) {
 }
 
 export default async function SearchPage({ searchParams }: SearchPageProps) {
-  const { city, checkInDate, checkOutDate, guestCapacity } = searchParams;
+  const city = searchParams.city;
+  const checkInDate = searchParams.checkInDate;
+  const checkOutDate = searchParams.checkOutDate;
+  const guestCapacity = searchParams.guestCapacity;
 
   const formatDate = (dateString?: string) => {
     if (!dateString) return null;

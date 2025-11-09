@@ -11,9 +11,10 @@ interface BookingPageProps {
 }
 
 export default async function BookingPage({ params }: BookingPageProps) {
+  const roomId = params.id;
   let room;
   try {
-    room = await fetchRoomDetails(params.id);
+    room = await fetchRoomDetails(roomId);
   } catch (error) {
     console.error(error);
     notFound();
