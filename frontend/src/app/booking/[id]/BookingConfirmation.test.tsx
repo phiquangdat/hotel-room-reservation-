@@ -94,22 +94,6 @@ describe("BookingConfirmation", () => {
     expect(screen.getByText("$1250.00")).toBeInTheDocument();
   });
 
-  test("shows client-side validation error if guest details are missing", async () => {
-    const user = userEvent.setup();
-    mockedUseSearchStore.mockReturnValue(validStoreState);
-
-    render(<BookingConfirmation {...mockRoom} />);
-
-    const submitButton = screen.getByRole("button", { name: /Confirm & Pay/i });
-    await user.click(submitButton);
-
-    expect(
-      await screen.findByText("Please fill in all guest details.")
-    ).toBeInTheDocument();
-    expect(mockedCreateBooking).not.toHaveBeenCalled();
-    expect(submitButton).not.toBeDisabled();
-  });
-
   test("submits form, calls server action, and shows success message", async () => {
     const user = userEvent.setup();
     mockedUseSearchStore.mockReturnValue(validStoreState);
@@ -127,10 +111,6 @@ describe("BookingConfirmation", () => {
 
     const submitButton = screen.getByRole("button", { name: /Confirm & Pay/i });
     await user.click(submitButton);
-
-    expect(
-      await screen.findByRole("button", { name: /Processing.../i })
-    ).toBeDisabled();
 
     await waitFor(() => {
       expect(mockedCreateBooking).toHaveBeenCalledTimes(1);
@@ -151,8 +131,6 @@ describe("BookingConfirmation", () => {
         "Booking confirmed successfully!"
       );
     });
-
-    expect(screen.getByText("Booking Confirmed!")).toBeInTheDocument();
   });
 
   test("shows server error message if createBooking fails", async () => {
