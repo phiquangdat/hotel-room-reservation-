@@ -63,6 +63,7 @@ export async function searchRooms(
   const queryString = query.toString();
   const url = `${backendUrl}/public/rooms/search?${queryString}`;
 
+  console.log("SIÚ", searchParams.city);
   try {
     const res = await fetch(url, {
       cache: "no-store",

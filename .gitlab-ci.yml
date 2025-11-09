@@ -10,9 +10,11 @@ build-frontend:
     - cd frontend
     - npm install
     - npm run build
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-    - if: '$CI_COMMIT_BRANCH == "main"'
+  artifacts:
+    paths:
+      - frontend/.next/
+      - frontend/node_modules/
+    expire_in: 1 hour
 
 build-backend:
   stage: build
@@ -21,6 +23,27 @@ build-backend:
     - echo "Building the Spring Boot Application"
     - cd backend
     - mvn package -DskipTests
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-    - if: '$CI_COMMIT_BRANCH == "main"'
+  artifacts:
+    paths:
+      - backend/target/
+    expire_in: 1 hour
+
+test-frontend:
+  stage: test
+  image: node:20
+  dependencies:
+    - build-frontend
+  script:
+    - echo "Running Next.js unit tests"
+    - cd frontend
+    - npm test
+
+test-backend:
+  stage: test
+  image: maven:3.9.6-eclipse-temurin-21
+  dependencies:
+    - build-backend
+  script:
+    - echo "Running Spring Boot unit tests"
+    - cd backend
+    - mvn clean test
