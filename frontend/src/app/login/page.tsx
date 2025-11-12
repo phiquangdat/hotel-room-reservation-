@@ -23,8 +23,13 @@ export default function LoginPage() {
     setError(null);
 
     try {
-      // Ensure this URL points to your backend API
-      const res = await fetch("http://localhost:8080/api/auth/login", {
+      // Use environment-backed backend base so Docker service names work
+      const backendBase =
+        (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080").replace(
+          /\/$/,
+          ""
+        ) + "/api";
+      const res = await fetch(`${backendBase}/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

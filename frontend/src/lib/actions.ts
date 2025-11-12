@@ -45,8 +45,11 @@ export interface BookingRoomProps extends RoomCardProps {
   hotelName: string;
 }
 
-const backendUrl =
-  process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8080/api";
+// Resolve a consistent backend API base from NEXT_PUBLIC_API_URL.
+// docker-compose sets NEXT_PUBLIC_API_URL=http://backend:8080 so we append /api
+// if it's not already present. Fall back to localhost for local dev.
+const _rawBackend = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+const backendUrl = `${_rawBackend.replace(/\/$/, "")}/api`;
 
 export async function searchRooms(
   searchParams: SearchParams
