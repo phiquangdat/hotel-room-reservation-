@@ -45,9 +45,9 @@ const mockedCreateBooking = createBooking as jest.Mock;
 const mockedToastSuccess = toast.success as jest.Mock;
 
 const mockRoom: BookingRoomProps = {
-  id: 10,
+  roomId: 10,
   roomNumber: "101",
-  roomTypeId: 1,
+  roomTypeId: "1",
   roomTypeName: "Deluxe Suite",
   imageUrl: "/test-image.jpg",
   pricePerNight: 250.0,
@@ -119,7 +119,7 @@ describe("BookingConfirmation", () => {
         lastName: "User",
         email: "test@user.com",
         phoneNumber: "123456789",
-        roomId: mockRoom.id,
+        roomId: mockRoom.roomId,
         checkInDate: validStoreState.checkInDate,
         checkOutDate: validStoreState.checkOutDate,
         numberOfGuests: validStoreState.guestCapacity,
