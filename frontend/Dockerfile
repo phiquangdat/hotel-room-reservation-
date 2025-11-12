@@ -1,15 +1,16 @@
-FROM node:20-alpine AS builder
+FROM node:20-slim AS builder
 
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm install
+
+RUN npm ci
 
 COPY . .
 
 RUN npm run build
 
-FROM node:20-alpine
+FROM node:20-slim
 
 WORKDIR /app
 
@@ -19,4 +20,5 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
 
 EXPOSE 3000
+
 CMD ["npm", "start"]

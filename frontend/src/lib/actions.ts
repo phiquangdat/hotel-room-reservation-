@@ -63,7 +63,6 @@ export async function searchRooms(
   const queryString = query.toString();
   const url = `${backendUrl}/public/rooms/search?${queryString}`;
 
-  console.log("SIÚ", searchParams.city);
   try {
     const res = await fetch(url, {
       cache: "no-store",
@@ -111,7 +110,21 @@ export async function fetchRoomDetails(id: string): Promise<BookingRoomProps> {
     if (!res.ok) {
       throw new Error(`API request failed with status ${res.status}`);
     }
-    return await res.json();
+    const data = await res.json();
+
+    return {
+      roomId: data.roomId ?? data.id ?? 0,
+      imageUrl:
+        data.imageUrl ??
+        "https://via.placeholder.com/1200x800?text=No+Image+Available",
+      hotelName: data.hotelName ?? "Unknown Hotel",
+      roomTypeId: data.roomTypeId ?? "N/A",
+      roomTypeName: data.roomTypeName ?? "Room",
+      pricePerNight: data.pricePerNight ?? 0,
+      capacity: data.capacity ?? 1,
+      roomNumber: data.roomNumber ?? "N/A",
+      status: data.status ?? "Available",
+    };
   } catch (error) {
     console.error("Failed to fetch room details: ", error);
     if (error instanceof Error) {
