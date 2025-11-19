@@ -12,10 +12,11 @@ import {
 
 export default function RegisterPage() {
   const [form, setForm] = useState({
-    username: "",
     email: "",
     firstName: "",
     password: "",
+    lastName: "",
+    phoneNumber: "",
   });
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
