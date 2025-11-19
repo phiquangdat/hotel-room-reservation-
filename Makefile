@@ -53,3 +53,6 @@ db/recreate: db/snapshot
 		psql -h $(LOCAL_DB_HOST) -p $(LOCAL_DB_PORT) -U $(LOCAL_DB_USER) -d postgres -c "CREATE DATABASE $(LOCAL_DB_NAME);" || true
 	# Restore the snapshot
 	$(MAKE) db/restore
+
+clean:
+	@rm -rf db_snapshot.dump db-data
