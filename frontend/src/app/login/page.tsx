@@ -1,34 +1,33 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { Mail, Lock, ArrowRight, AlertCircle } from "lucide-react";
 
 export default function LoginPage() {
-  const router = useRouter();
   const [form, setForm] = useState({
     // Assuming your backend uses email for login, adjust if using username
     email: "",
     password: "",
   });
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
 
     try {
-      // Use environment-backed backend base so Docker service names work
       const backendBase =
         (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080").replace(
           /\/$/,
           ""
         ) + "/api";
+
       const res = await fetch(`${backendBase}/auth/login`, {
         method: "POST",
         headers: {
@@ -44,114 +43,123 @@ export default function LoginPage() {
       const data = await res.json(); // Always try to parse JSON
 
       if (!res.ok) {
-        // Use the message from the backend response if available
-        throw new Error(
-          data.message || `Login failed with status: ${res.status}`
-        );
+        throw new Error(data.message || "Login failed");
       }
 
       // --- IMPORTANT: Handle the JWT Token ---
       // Assuming your backend sends back a token like { token: "..." }
       if (data.token) {
-        // Store the token securely (e.g., localStorage or secure cookie)
-        localStorage.setItem("authToken", data.token);
-        console.log("Login successful, token stored.");
-        // Redirect to the dashboard or homepage after successful login
-        router.push("/dashboard"); // Or "/"
+        alert("Login successful!");
       } else {
-        throw new Error("Login response did not include a token.");
+        throw new Error("Login response did not include a token");
       }
-    } catch (err: unknown) {
-      // 1. Catch error as 'unknown'
-      // 2. Perform type checking before accessing properties
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError("An unexpected error occurred.");
-      }
-      console.error("Login error:", err); // Log the actual error for debugging
+    } catch (err) {
+      if (err instanceof Error) setError(err.message);
+      else setError("An unexpected error occurred");
+      console.error("Login error:", err);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white p-8 rounded-lg shadow-xl w-full max-w-md border border-gray-200"
-      >
-        <h2 className="text-3xl font-bold mb-8 text-center text-gray-800">
-          Welcome Back
-        </h2>
-
-        {error && (
-          <div
-            className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4"
-            role="alert"
-          >
-            <span className="block sm:inline">{error}</span>
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 p-4">
+      <div className="w-full max-w-md">
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-indigo-600 to-purple-600 rounded-2xl mb-4 shadow-lg">
+            <Lock className="w-8 h-8 text-white" />
           </div>
-        )}
-
-        <div className="mb-4">
-          <label
-            className="block text-gray-700 text-sm font-bold mb-2"
-            htmlFor="email"
-          >
-            Email Address
-          </label>
-          <input
-            id="email"
-            type="email"
-            name="email"
-            placeholder="you@example.com"
-            value={form.email}
-            onChange={handleChange}
-            className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-            required
-          />
-        </div>
-        <div className="mb-6">
-          <label
-            className="block text-gray-700 text-sm font-bold mb-2"
-            htmlFor="password"
-          >
-            Password
-          </label>
-          <input
-            id="password"
-            type="password"
-            name="password"
-            placeholder="••••••••"
-            value={form.password}
-            onChange={handleChange}
-            className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 mb-3 leading-tight focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-            required
-          />
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            Welcome back
+          </h1>
+          <p className="text-gray-600">Sign in to your account to continue</p>
         </div>
 
-        <div className="flex items-center justify-between">
-          <button
-            type="submit"
-            disabled={loading}
-            className={`w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded focus:outline-none focus:shadow-outline transition duration-150 ease-in-out ${
-              loading ? "opacity-50 cursor-not-allowed" : ""
-            }`}
-          >
-            {loading ? "Signing In..." : "Sign In"}
-          </button>
+        <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+          <form onSubmit={handleSubmit} className="p-8">
+            {error && (
+              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-start gap-3">
+                <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                <span className="text-red-800 text-sm">{error}</span>
+              </div>
+            )}
+
+            <div className="mb-5">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Email address
+              </label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="you@example.com"
+                  value={form.email}
+                  onChange={handleChange}
+                  className="placeholder:text-gray-400 w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition font-semibold text-gray-600"
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="mb-6">
+              <div className="flex items-center justify-between mb-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Password
+                </label>
+                <a
+                  href="/forgot-password"
+                  className="text-sm text-indigo-600 hover:text-indigo-700 font-medium"
+                >
+                  Forgot Password?
+                </a>
+              </div>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input
+                  type="password"
+                  name="password"
+                  placeholder="••••••••"
+                  value={form.password}
+                  onChange={handleChange}
+                  className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition font-semibold text-gray-600"
+                  required
+                />
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-indigo-600 to-purple-600 text-white py-3.5 rounded-xl font-semibold hover:from-indigo-700 hover:to-purple-700 focus:ring-4 focus:ring-indigo-200 transition shadow-lg shadow-indigo-500/30 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2 group"
+            >
+              {loading ? (
+                <>
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  Signing in...
+                </>
+              ) : (
+                <>
+                  Sign in
+                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </>
+              )}
+            </button>
+          </form>
+
+          <div className="px-8 py-6 bg-gray-50 border-t border-gray-100">
+            <p className="text-center text-sm text-gray-600">
+              Don't have an account?{" "}
+              <a
+                href="/register"
+                className="text-indigo-600 hover:text-indigo-700 font-semibold"
+              >
+                Sign up for free
+              </a>
+            </p>
+          </div>
         </div>
-        {/* Optional: Add links for registration or password reset */}
-        <div className="text-center mt-6">
-          <a
-            href="/register"
-            className="inline-block align-baseline font-bold text-sm text-indigo-600 hover:text-indigo-800"
-          >
-            Don&apos;t have an account? Sign Up
-          </a>
-        </div>
-      </form>
+      </div>
     </div>
   );
 }
