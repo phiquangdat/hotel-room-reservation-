@@ -5,7 +5,6 @@ import { Mail, Lock, ArrowRight, AlertCircle } from "lucide-react";
 
 export default function LoginPage() {
   const [form, setForm] = useState({
-    // Assuming your backend uses email for login, adjust if using username
     email: "",
     password: "",
   });
@@ -34,20 +33,17 @@ export default function LoginPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          // Send email as 'username' if that's what your backend expects
-          username: form.email,
+          email: form.email,
           password: form.password,
         }),
       });
 
-      const data = await res.json(); // Always try to parse JSON
+      const data = await res.json();
 
       if (!res.ok) {
         throw new Error(data.message || "Login failed");
       }
 
-      // --- IMPORTANT: Handle the JWT Token ---
-      // Assuming your backend sends back a token like { token: "..." }
       if (data.token) {
         alert("Login successful!");
       } else {

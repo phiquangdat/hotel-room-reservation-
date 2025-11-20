@@ -15,6 +15,7 @@ export default function RegisterPage() {
     email: "",
     firstName: "",
     password: "",
+    firstName: "",
     lastName: "",
     phoneNumber: "",
   });
