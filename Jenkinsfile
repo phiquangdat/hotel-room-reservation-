@@ -19,12 +19,12 @@ pipeline {
                     if (fileExists('.env')) {
                         sh 'cp .env .env'
                     }
-                    } else {
+                    else {
                         echo 'Warning: No .env or .env.jenkins found. Using defaults (may fail)'
                     }
                 }
+            }
         }
-
 
         // Stage 3: Run backend unit tests
         stage('Test Backend') {
