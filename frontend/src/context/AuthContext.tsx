@@ -1,4 +1,5 @@
 "use client";
+
 import {
   createContext,
   useContext,
@@ -9,6 +10,12 @@ import {
 import { useRouter } from "next/navigation";
 
 interface User {
+  email: string;
+  firstName?: string;
+}
+
+interface AuthResponse {
+  token: string;
   email: string;
   firstName?: string;
 }
@@ -35,8 +42,9 @@ export const AuthProvider = ({ children }: Props) => {
   useEffect(() => {
     const token = localStorage.getItem("token");
     const email = localStorage.getItem("email");
+    const firstName = localStorage.getItem("firstName");
     if (token && email) {
-      setUser({ email });
+      setUser({ email, firstName: firstName || undefined });
     }
   }, []);
 
@@ -49,22 +57,26 @@ export const AuthProvider = ({ children }: Props) => {
       body: JSON.stringify({ email, password }),
     });
 
-    if (!res.ok) {
-      const error = await res.text();
-      throw new Error(error || "Login failed");
-    }
+    const data: AuthResponse = await res.json();
 
-    const data = await res.text();
+    if (!res.ok) {
+      throw new Error(
+        data?.token ? "Login failed" : data?.email || "Login failed"
+      );
+    }
 
     localStorage.setItem("token", data.token);
     localStorage.setItem("email", data.email);
+    if (data.firstName) localStorage.setItem("firstName", data.firstName);
+
     setUser({ email: data.email, firstName: data.firstName });
-    router.push("/dashboard");
+    router.push("/");
   };
 
   const logout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("email");
+    localStorage.removeItem("firstName");
     setUser(null);
     router.push("/login");
   };
@@ -76,7 +88,7 @@ export const AuthProvider = ({ children }: Props) => {
   );
 };
 
-export const useAuth = () => {
+export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
   if (!context) throw new Error("useAuth must be used within an AuthProvider");
   return context;
