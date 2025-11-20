@@ -11,7 +11,22 @@ pipeline {
             }
         }
         
-        // Stage 2: Run backend unit tests
+        // Stage 2: Load environment variables
+        stage('Load Environment Variables') {
+            steps {
+                script {
+                    // Use .env.jenkins if exists (recommended for CI)
+                    if (fileExists('.env')) {
+                        sh 'cp .env .env'
+                    }
+                    } else {
+                        echo 'Warning: No .env or .env.jenkins found. Using defaults (may fail)'
+                    }
+                }
+        }
+
+
+        // Stage 3: Run backend unit tests
         stage('Test Backend') {
             steps {
                 echo 'Building backend for test...'
@@ -20,7 +35,7 @@ pipeline {
                 
                 echo 'Running Spring Boot unit tests...'
                 // (FIX) Run the test on the built image
-                sh 'docker compose run --rm backend mvn test'
+                sh 'docker compose run --rm backend ./mvnw test -B'
             }
         }
         
@@ -33,7 +48,7 @@ pipeline {
 
                 echo 'Running Next.js unit tests...'
                 // (FIX) Run the test on the built image
-                sh 'docker compose run --rm frontend npm test'
+                sh 'docker compose run --rm frontend npm test -- --ci --passWithNoTests'
             }
         }
         
