@@ -74,8 +74,17 @@ export async function searchRooms(
     if (!res.ok) {
       throw new Error(`API request failed with status ${res.status}`);
     }
-
-    return await res.json();
+    const data = await res.json();
+    console.log("SIUU", data);
+    return data.map((item: any) => ({
+      roomId: item.roomId,
+      hotelName: item.hotelName,
+      city: item.city,
+      roomTypeName: item.roomType,
+      imageUrl: item.imageUrl || "/placeholder.jpg",
+      pricePerNight: Number(item.pricePerNight),
+      capacity: item.capacity,
+    }));
   } catch (error) {
     console.error("Failed to fetch search results: ", error);
     throw new Error("Could not fetch room data. Please try again later.");
