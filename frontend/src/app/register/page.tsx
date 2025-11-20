@@ -10,23 +10,31 @@ import {
   UserPlus,
 } from "lucide-react";
 
+interface RegisterForm {
+  email: string;
+  firstName: string;
+  lastName: string;
+  password: string;
+  phoneNumber: string;
+}
+
 export default function RegisterPage() {
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<RegisterForm>({
     email: "",
     firstName: "",
-    password: "",
-    firstName: "",
     lastName: "",
+    password: "",
     phoneNumber: "",
   });
-  const [error, setError] = useState(null);
+
+  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
@@ -40,9 +48,7 @@ export default function RegisterPage() {
 
       const res = await fetch(`${backendBase}/auth/register`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
       });
 
@@ -53,10 +59,11 @@ export default function RegisterPage() {
       }
 
       alert("Registration successful! Redirecting to login...");
-    } catch (err) {
+      window.location.href = "/login";
+    } catch (err: unknown) {
       if (err instanceof Error) setError(err.message);
       else setError("An unexpected error occurred");
-      console.error(err);
+      console.error("Registration error:", err);
     } finally {
       setLoading(false);
     }
@@ -76,7 +83,7 @@ export default function RegisterPage() {
         </div>
 
         <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
-          <div className="p-8">
+          <form onSubmit={handleSubmit} className="p-8">
             {error && (
               <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-start gap-3">
                 <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
@@ -104,6 +111,24 @@ export default function RegisterPage() {
 
             <div className="mb-5">
               <label className="block text-sm font-medium text-gray-700 mb-2">
+                Last name
+              </label>
+              <div className="relative">
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input
+                  type="text"
+                  name="lastName"
+                  placeholder="Doe"
+                  value={form.lastName}
+                  onChange={handleChange}
+                  className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition font-semibold text-gray-900"
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="mb-5">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Email address
               </label>
               <div className="relative">
@@ -116,6 +141,23 @@ export default function RegisterPage() {
                   onChange={handleChange}
                   className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition font-semibold text-gray-900"
                   required
+                />
+              </div>
+            </div>
+
+            <div className="mb-5">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Phone number
+              </label>
+              <div className="relative">
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input
+                  type="tel"
+                  name="phoneNumber"
+                  placeholder="+1234567890"
+                  value={form.phoneNumber}
+                  onChange={handleChange}
+                  className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition font-semibold text-gray-900"
                 />
               </div>
             </div>
@@ -144,8 +186,7 @@ export default function RegisterPage() {
             <button
               type="submit"
               disabled={loading}
-              onClick={handleSubmit}
-              className="w-full bg-indigo-600 text-white py-3.5 rounded-xl font-semibold hover:from-purple-700 hover:to-indigo-700 focus:ring-4 focus:ring-purple-200 transition shadow-lg shadow-purple-500/30 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2 group"
+              className="w-full bg-indigo-600 text-white py-3.5 rounded-xl font-semibold hover:from-purple-700 hover:to-indigo-700 focus:ring-4 focus:ring-purple-200 transition shadow-lg shadow-purple-500/30 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {loading ? (
                 <>
@@ -155,22 +196,20 @@ export default function RegisterPage() {
               ) : (
                 <>
                   Create account
-                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  <ArrowRight className="w-5 h-5 ml-2" />
                 </>
               )}
             </button>
-          </div>
+          </form>
 
-          <div className="px-8 py-6 bg-gray-50 border-t border-gray-100">
-            <p className="text-center text-sm text-gray-600">
-              Already have an account?{" "}
-              <a
-                href="/login"
-                className="text-purple-600 hover:text-purple-700 font-semibold"
-              >
-                Sign in
-              </a>
-            </p>
+          <div className="px-8 py-6 bg-gray-50 border-t border-gray-100 text-center text-sm text-gray-600">
+            Already have an account?{" "}
+            <a
+              href="/login"
+              className="text-purple-600 hover:text-purple-700 font-semibold"
+            >
+              Sign in
+            </a>
           </div>
         </div>
       </div>
