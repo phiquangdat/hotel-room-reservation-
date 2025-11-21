@@ -20,7 +20,7 @@ pipeline {
             }
         }
 
-        tage('Create .env for Docker Compose') {
+        stage('Create .env for Docker Compose') {
             steps {
                 sh '''
                     cat > .env << EOF
