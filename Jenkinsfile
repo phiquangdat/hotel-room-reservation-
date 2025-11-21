@@ -6,7 +6,7 @@ pipeline {
         LOCAL_DB_USER = "${env.LOCAL_DB_USER}"
         LOCAL_DB_PASSWORD = "${env.LOCAL_DB_PASSWORD}"
         LOCAL_DB_NAME = "${env.LOCAL_DB_NAME}"
-        LOCAL_DB_PORT = "${env.LOCAL_DB_PORT}"
+        LOCAL_DB_PORT = 5432
         JWT_SECRET = "${env.JWT_SECRET}"
         JWT_EXPIRATION = "${env.JWT_EXPIRATION}"
     }
