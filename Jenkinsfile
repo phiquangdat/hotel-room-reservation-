@@ -1,6 +1,15 @@
 pipeline {
     // This pipeline can run on any available Jenkins agent (node)
     agent any 
+
+    environment {
+        LOCAL_DB_USER = "${env.LOCAL_DB_USER}"
+        LOCAL_DB_PASSWORD = "${env.LOCAL_DB_PASSWORD}"
+        LOCAL_DB_NAME = "${env.LOCAL_DB_NAME}"
+        LOCAL_DB_PORT = "${env.LOCAL_DB_PORT}"
+        JWT_SECRET = "${env.JWT_SECRET}"
+        JWT_EXPIRATION = "${env.JWT_EXPIRATION}"
+    }
     
     stages {
         // Stage 1: Get the code from your Git repository
@@ -10,19 +19,19 @@ pipeline {
                 checkout scm
             }
         }
-        
-        // Stage 2: Load environment variables
-        stage('Load Environment Variables') {
+
+        tage('Create .env for Docker Compose') {
             steps {
-                script {
-                    // Use .env.jenkins if exists (recommended for CI)
-                    if (fileExists('.env')) {
-                        sh 'cp .env .env'
-                    }
-                    else {
-                        echo 'Warning: No .env or .env.jenkins found. Using defaults (may fail)'
-                    }
-                }
+                sh '''
+                    cat > .env << EOF
+                LOCAL_DB_USER=${LOCAL_DB_USER}
+                LOCAL_DB_PASSWORD=${LOCAL_DB_PASSWORD}
+                LOCAL_DB_NAME=${LOCAL_DB_NAME}
+                LOCAL_DB_PORT=${LOCAL_DB_PORT}
+                JWT_SECRET=${JWT_SECRET}
+                JWT_EXPIRATION=${JWT_EXPIRATION}
+                EOF
+                '''
             }
         }
 
