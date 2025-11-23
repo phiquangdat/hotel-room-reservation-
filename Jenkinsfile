@@ -20,7 +20,17 @@ pipeline {
             }
         }
 
-        stage('Create .env for Docker Compose') {
+        stage('Install Docker CLI') {
+            steps {
+                sh '''
+                apt update
+                apt install -y docker.io
+                '''
+            }
+        }
+        
+        // Stage 2: Load environment variables
+        stage('Load Environment Variables') {
             steps {
                 sh '''
                     cat > .env << EOF
