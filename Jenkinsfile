@@ -13,21 +13,12 @@ pipeline {
     
     stages {
         // Stage 1: Get the code from your Git repository
-        stage('Checkout') {
-            steps {
-                echo 'Checking out code from Git...'
-                checkout scm
-            }
-        }
-
-        stage('Install Docker CLI') {
-            steps {
-                sh '''
-                apt update
-                apt install -y docker.io
-                '''
-            }
-        }
+        // stage('Checkout') {
+        //     steps {
+        //         echo 'Checking out code from Git...'
+        //         checkout scm
+        //     }
+        // }
         
         // Stage 2: Load environment variables
         stage('Load Environment Variables') {
