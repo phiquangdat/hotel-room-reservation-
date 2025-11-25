@@ -3,19 +3,19 @@ pipeline {
 
     stages {
         stage('Load Environment Variables') {
-            steps {
-                sh '''
+steps {
+sh '''#!/bin/bash
 cat > .env <<EOF
-LOCAL_DB_USER=${env.LOCAL_DB_USER}
-LOCAL_DB_PASSWORD=${env.LOCAL_DB_PASSWORD}
-LOCAL_DB_NAME=${env.LOCAL_DB_NAME}
-LOCAL_DB_PORT=5432
-JWT_SECRET=${env.JWT_SECRET}
-JWT_EXPIRATION=${env.JWT_EXPIRATION}
+LOCAL_DB_USER=$LOCAL_DB_USER
+LOCAL_DB_PASSWORD=$LOCAL_DB_PASSWORD
+LOCAL_DB_NAME=$LOCAL_DB_NAME
+LOCAL_DB_PORT=$LOCAL_DB_PORT
+JWT_SECRET=$JWT_SECRET
+JWT_EXPIRATION=$JWT_EXPIRATION
 EOF
 '''
-            }
-        }
+}
+}
 
         stage('Test Backend') {
             steps {
