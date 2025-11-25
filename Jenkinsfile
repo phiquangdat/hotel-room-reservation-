@@ -37,7 +37,7 @@ pipeline {
         stage('Test Backend') {
             steps {
                 echo 'Building backend for test...'
-                sh 'docker compose build --progress plain backend'
+                sh 'docker compose --progress plain build backend'
 
                 echo 'Running Spring Boot unit tests...'
                 sh 'docker compose run --rm backend ./mvnw test -B'
@@ -47,7 +47,7 @@ pipeline {
         stage('Test Frontend') {
             steps {
                 echo 'Building frontend for test...'
-                sh 'docker compose build --progress plain frontend'
+                sh 'docker compose --progress plain build frontend'
 
                 echo 'Running Next.js unit tests...'
                 sh 'docker compose run --rm frontend npm test -- --ci --passWithNoTests'
