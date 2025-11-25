@@ -1,14 +1,21 @@
-FROM jenkins/jenkins:lts
+# Dockerfile.jenkins
+FROM jenkins/jenkins:lts-jdk17
+
 USER root
 
+# Install Docker CLI
 RUN apt-get update && \
-    apt-get install -y docker.io curl jq && \
-    apt-get clean
+    apt-get install -y docker.io curl && \
+    rm -rf /var/lib/apt/lists/*
 
-RUN mkdir -p /usr/libexec/docker/cli-plugins && \
-    curl -SL https://github.com/docker/compose/releases/latest/download/docker-compose-linux-x86_64 \
-    -o /usr/libexec/docker/cli-plugins/docker-compose && \
-    chmod +x /usr/libexec/docker/cli-plugins/docker-compose
+# Install Docker Compose v2 (CLI plugin)
+RUN mkdir -p /usr/libexec/docker/cli-plugins \
+    && curl -SL https://github.com/docker/compose/releases/download/v2.40.3/docker-compose-linux-x86_64 -o /usr/libexec/docker/cli-plugins/docker-compose \
+    && chmod +x /usr/libexec/docker/cli-plugins/docker-compose
 
-RUN usermod -aG docker jenkins
+# Optional: Install buildx (if you need advanced builds)
+RUN mkdir -p ~/.docker/cli-plugins \
+    && curl -SL https://github.com/docker/buildx/releases/download/v0.13.1/buildx-v0.13.1.linux-amd64 -o ~/.docker/cli-plugins/docker-buildx \
+    && chmod +x ~/.docker/cli-plugins/docker-buildx
+
 USER jenkins
