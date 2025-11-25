@@ -11,14 +11,6 @@ pipeline {
     }
 
     stages {
-
-        stage('Checkout') {
-            steps {
-                echo 'Checking out code from Git...'
-                checkout scm
-            }
-        }
-
         stage('Load Environment Variables') {
             steps {
                 sh '''
