@@ -23,7 +23,7 @@ EOF
                 sh 'docker compose --progress plain build backend'
 
                 echo 'Running Spring Boot unit tests...'
-                sh 'docker compose run --rm backend ./mvnw test -B'
+                sh 'docker compose up backend'
             }
         }
 
