@@ -51,8 +51,7 @@ EOF
         stage('Deploy') {
             steps {
                 echo 'Deploying backend and frontend...'
-                sh 'docker compose up -d --build backend frontend
-'
+                sh 'docker compose up -d --build backend frontend'
             }
         }
     }
