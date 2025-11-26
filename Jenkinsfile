@@ -1,5 +1,8 @@
 pipeline {
     agent any
+    environment {
+        BACKEND_PORT = "9090"
+    }
 
     stages {
         stage('Load Environment Variables') {
