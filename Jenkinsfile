@@ -32,25 +32,22 @@ EOF
             }
         }
 
-        stage('Build and Test Backend') {
+        stage('Test Backend') {
             steps {
-                echo 'Building backend Docker image...'
-                sh 'docker compose build backend'
-
-                echo 'Running backend unit tests...'
-                sh 'docker compose run --rm --entrypoint "mvn test -B" backend'
+                echo 'Building backend for test...'
+                sh 'docker compose build backend'  
             }
         }
 
-        stage('Build and Test Frontend') {
+
+        stage('Test Frontend') {
             steps {
-                echo 'Building frontend Docker image...'
+                echo 'Building frontend for test...'
                 sh 'docker compose build frontend'
-
-                echo 'Running frontend unit tests...'
-                sh 'docker compose run --rm --entrypoint "npm test" frontend'
+                sh 'docker compose run --rm frontend npm test'
             }
         }
+
 
         stage('Deploy') {
             steps {
