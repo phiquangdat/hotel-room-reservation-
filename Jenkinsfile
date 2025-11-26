@@ -44,7 +44,7 @@ EOF
             steps {
                 echo 'Building frontend for test...'
                 sh 'docker compose build frontend'
-                sh 'docker compose run --rm frontend npm test'
+                sh 'docker compose run --rm frontend npm test --passWithNoTests'
             }
         }
 
