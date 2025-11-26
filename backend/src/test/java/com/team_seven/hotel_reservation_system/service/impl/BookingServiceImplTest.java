@@ -1,5 +1,7 @@
 package com.team_seven.hotel_reservation_system.service.impl;
 
+import org.springframework.test.context.ActiveProfiles;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -26,6 +28,7 @@ import com.team_seven.hotel_reservation_system.repositories.CustomerRepository;
 import com.team_seven.hotel_reservation_system.repositories.RoomRepository;
 
 @ExtendWith(MockitoExtension.class)
+@ActiveProfiles("test") 
 class BookingServiceImplTest {
 
     @Mock
