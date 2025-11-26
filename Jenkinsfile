@@ -21,26 +21,6 @@ EOF
 }
 
         stage('Test Backend') {
-    steps {
-        echo 'Building backend for test...'
-        sh 'docker compose --progress plain build backend'
-
-        echo 'Starting database...'
-        sh 'docker compose up -d db'
-
-        echo 'Waiting for database to be ready...'
-        sh '''
-        until docker exec hotel_db pg_isready -U $LOCAL_DB_USER; do
-          echo "Waiting for database..."
-          sleep 2
-        done
-        '''
-
-        echo 'Running Spring Boot unit tests...'
-        sh 'docker compose run --rm backend mvn test'
-    }
-}
-        stage('Test Backend') {
             steps {
                 echo 'Building backend for test...'
                 sh 'docker compose --progress plain build backend'
