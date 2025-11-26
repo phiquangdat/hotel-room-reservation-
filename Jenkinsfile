@@ -18,47 +18,46 @@ pipeline {
                     string(credentialsId: 'jenkins-jwt-secret', variable: 'JWT_SECRET')
                 ]) {
                     sh '''
-                    cat > .env <<EOF
-                    LOCAL_DB_HOST=${LOCAL_DB_HOST}
-                    LOCAL_DB_PORT=${LOCAL_DB_PORT}
-                    LOCAL_DB_USER=${LOCAL_DB_USER}
-                    LOCAL_DB_PASSWORD=${LOCAL_DB_PASSWORD}
-                    LOCAL_DB_NAME=${LOCAL_DB_NAME}
-                    JWT_SECRET=${JWT_SECRET}
-                    JWT_EXPIRATION=${JWT_EXPIRATION}
-                    EOF
-                    '''
+cat > .env <<EOF
+LOCAL_DB_HOST=${LOCAL_DB_HOST}
+LOCAL_DB_PORT=${LOCAL_DB_PORT}
+LOCAL_DB_USER=${LOCAL_DB_USER}
+LOCAL_DB_PASSWORD=${LOCAL_DB_PASSWORD}
+LOCAL_DB_NAME=${LOCAL_DB_NAME}
+JWT_SECRET=${JWT_SECRET}
+JWT_EXPIRATION=${JWT_EXPIRATION}
+EOF
+'''
                 }
             }
         }
 
-        stage('Test Backend') {
+        stage('Build and Test Backend') {
             steps {
-                echo 'Building backend for test...'
-                sh 'docker compose --progress plain build backend'
+                echo 'Building backend Docker image...'
+                sh 'docker compose build backend'
 
-                echo 'Running Spring Boot unit tests...'
-                sh 'docker compose run --rm backend mvn test'
+                echo 'Running backend unit tests...'
+                sh 'docker compose run --rm --entrypoint "mvn test -B" backend'
             }
         }
 
-        stage('Test Frontend') {
+        stage('Build and Test Frontend') {
             steps {
-                echo 'Building frontend for test...'
-                sh 'docker compose --progress plain build frontend'
+                echo 'Building frontend Docker image...'
+                sh 'docker compose build frontend'
 
-                echo 'Running Next.js unit tests...'
-                sh 'docker compose run --rm frontend npm test'
+                echo 'Running frontend unit tests...'
+                sh 'docker compose run --rm --entrypoint "npm test" frontend'
             }
         }
 
         stage('Deploy') {
             steps {
-                echo 'All tests passed! Deploying application...'
+                echo 'Deploying backend and frontend...'
                 sh 'docker compose up -d --build'
             }
         }
-
     }
 
     post {
