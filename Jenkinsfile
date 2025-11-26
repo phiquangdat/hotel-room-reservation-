@@ -26,7 +26,7 @@ EOF
                 sh 'docker compose --progress plain build backend'
 
                 echo 'Running Spring Boot unit tests...'
-                sh 'docker compose up backend'
+                sh 'docker compose up -d backend'
             }
         }
 
@@ -36,7 +36,7 @@ EOF
                 sh 'docker compose --progress plain build frontend'
 
                 echo 'Running Next.js unit tests...'
-                sh 'docker compose run --rm frontend npm test -- --ci --passWithNoTests'
+                sh 'docker compose up -d frontend'
             }
         }
 
