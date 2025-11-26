@@ -32,7 +32,7 @@ EOF
             }
         }
 
-        stage('Test Backend') {
+        stage('Build Backend') {
             steps {
                 echo 'Building backend for test...'
                 sh 'docker compose build backend'  
@@ -40,10 +40,9 @@ EOF
         }
 
 
-        stage('Test Frontend') {
+        stage('Build Frontend') {
             steps {
                 echo 'Building frontend for test...'
-                sh 'docker compose build frontend'
                 sh 'docker compose build frontend'
             }
         }
@@ -52,7 +51,8 @@ EOF
         stage('Deploy') {
             steps {
                 echo 'Deploying backend and frontend...'
-                sh 'docker compose up -d --build'
+                sh 'docker compose up -d --build backend frontend
+'
             }
         }
     }
