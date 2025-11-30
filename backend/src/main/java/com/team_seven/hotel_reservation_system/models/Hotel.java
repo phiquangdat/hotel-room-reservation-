@@ -20,11 +20,11 @@ public class Hotel {
     @Column(name = "id")
     private Long id;
     
-    @JsonManagedReference(value = "hotel-roomtype")
-    @OneToMany(mappedBy = "hotel", fetch = FetchType.LAZY)
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
-    private Set<RoomType> roomTypes;
+    // @JsonManagedReference(value = "hotel-roomtype")
+    // @OneToMany(mappedBy = "hotel", fetch = FetchType.LAZY)
+    // @ToString.Exclude
+    // @EqualsAndHashCode.Exclude
+    // private Set<RoomType> roomTypes;
 
     @Column(name = "name", nullable = false)
     private String name;

@@ -1,0 +1,45 @@
+package com.team_seven.hotel_reservation_system.service;
+
+import com.team_seven.hotel_reservation_system.dto.HotelDto;
+import com.team_seven.hotel_reservation_system.models.Hotel;
+import com.team_seven.hotel_reservation_system.repositories.HotelRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+@Transactional(readOnly = true)
+public class HotelService {
+
+    @Autowired
+    private HotelRepository hotelRepository;
+
+    public List<HotelDto> getAll() {
+        return hotelRepository.findAll().stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
+    }
+
+    public List<HotelDto> getTopRated() {
+        return hotelRepository.findTop3ByRatingIsNotNullOrderByRatingDesc().stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
+    }
+
+    private HotelDto toDto(Hotel h) {
+        if (h == null) return null;
+
+        return HotelDto.builder()
+                .id(h.getId())
+                .name(h.getName())
+                .address(h.getAddress())
+                .city(h.getCity())
+                .phoneNumber(h.getPhoneNumber())
+                .description(h.getDescription())
+                .rating(h.getRating())
+                .build();
+    }
+}

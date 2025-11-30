@@ -1,7 +1,6 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-
 export interface SearchParams {
   city?: string;
   checkInDate?: string;
@@ -17,6 +16,16 @@ export interface Hotel {
   phoneNumber: string;
   description: string;
   rating: number;
+}
+
+export interface RoomType {
+  id: number;
+  name: string;
+  hotel: Hotel;
+  pricePerNight: number;
+  capacity: number;
+  description: string;
+  imageUrl: string;
 }
 
 export interface BookingFormData {
@@ -206,6 +215,28 @@ export async function fetchAllRooms(): Promise<BookingRoomProps[]> {
   }
 }
 
+export async function fetchAllRoomTypes(): Promise<RoomType[]> {
+  try {
+    const res = await fetch(`${backendUrl}/room-types`, { cache: "no-store" });
+    if (!res.ok) throw new Error("Failed to fetch room types");
+    return await res.json();
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
+}
+
+export async function fetchAllHotels(): Promise<Hotel[]> {
+  try {
+    const res = await fetch(`${backendUrl}/hotels`, { cache: "no-store" });
+    if (!res.ok) throw new Error("Failed to fetch hotels");
+    return await res.json();
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
+}
+
 export async function deleteRoom(roomId: number) {
   const url = `${backendUrl}/rooms/${roomId}`;
   try {
@@ -247,5 +278,42 @@ export async function updateRoom(roomId: number, data: any) {
   } catch (error) {
     console.error("Failed to update room:", error);
     return { error: "Failed to update room" };
+  }
+}
+
+export async function createRoom(data: any, token: string) {
+  const url = `${backendUrl}/rooms`;
+
+  const payload = {
+    roomNumber: data.roomNumber,
+    roomTypeName: data.roomType,
+    hotelName: data.hotel,
+    pricePerNight: parseFloat(data.price),
+    status: data.status,
+    capacity: data.capacity ? parseInt(data.capacity) : 2,
+    description: data.description || "",
+    imageUrl: data.imageUrl || null,
+  };
+
+  try {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) {
+      throw new Error(`Failed to create room: ${res.status}`);
+    }
+
+    const newRoom = await res.json();
+    revalidatePath("/admin/rooms");
+    return { success: true, data: newRoom };
+  } catch (error) {
+    console.error("Failed to create room:", error);
+    return { error: "Failed to create room" };
   }
 }

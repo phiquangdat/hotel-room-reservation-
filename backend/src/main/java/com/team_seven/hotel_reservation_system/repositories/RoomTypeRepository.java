@@ -2,6 +2,7 @@ package com.team_seven.hotel_reservation_system.repositories;
 
 import com.team_seven.hotel_reservation_system.dto.RoomSearchResultDto;
 import com.team_seven.hotel_reservation_system.models.RoomType;
+import com.team_seven.hotel_reservation_system.models.Hotel;
 import com.team_seven.hotel_reservation_system.models.Room;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -12,8 +13,7 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDate;
 
 import java.util.List;
-
-
+import java.util.Optional;
 
 @Repository
 public interface RoomTypeRepository extends JpaRepository<RoomType, Long> {
@@ -46,4 +46,6 @@ public interface RoomTypeRepository extends JpaRepository<RoomType, Long> {
         @Param("checkOutDate") LocalDate checkOutDate,
         @Param("guestCapacity") int guestCapacity
     );
+    Optional<RoomType> findByName(String name);
+    Optional<RoomType> findByNameAndHotel(String name, Hotel hotel);
 }

@@ -47,9 +47,12 @@ export default function RoomTable({ initialRooms }: RoomTableProps) {
       <div className="bg-white rounded-lg shadow p-6">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold text-gray-900">All Rooms</h1>
-          <button className="bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors">
+          <Link
+            href="/admin/rooms/new/"
+            className="bg-amber-600 text-white px-4 py-2 rounded-lg transition-colors"
+          >
             Add New Room
-          </button>
+          </Link>
         </div>
 
         {rooms.length === 0 ? (
@@ -110,7 +113,7 @@ export default function RoomTable({ initialRooms }: RoomTableProps) {
                       <td className="p-3">
                         <StatusBadge status={room.status} />
                       </td>
-                      <td className="p-3 text-right space-x-2">
+                      <td className="p-3 text-right space-x-4">
                         <Link
                           href={`/admin/rooms/${room.roomId}/edit`}
                           className="text-indigo-600 hover:text-indigo-800 hover:underline font-medium"

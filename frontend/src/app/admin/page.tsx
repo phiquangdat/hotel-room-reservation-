@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { BedDouble, Plus, Settings, Users } from "lucide-react";
+import { BedDouble, Plus } from "lucide-react";
 
 export default function AdminDashboard() {
   return (

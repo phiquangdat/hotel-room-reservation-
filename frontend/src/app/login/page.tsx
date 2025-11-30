@@ -50,7 +50,7 @@ export default function LoginPage() {
         );
         console.log(data);
         toast.success(`Welcome back, ${data.firstName || "User"}!`);
-        router.push("/"); // redirect to home page on success
+        router.push("/");
       } else {
         throw new Error("Login response did not include a token");
       }

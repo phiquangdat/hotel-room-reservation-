@@ -30,15 +30,9 @@ export default function AdminLayout({
               <BedDouble className="w-5 h-5" />
               Manage Rooms
             </Link>
-            {/* Future Feature */}
-            <div className="flex items-center gap-3 px-4 py-3 text-gray-400 cursor-not-allowed">
-              <CalendarCheck className="w-5 h-5" />
-              Bookings (Soon)
-            </div>
           </nav>
         </aside>
 
-        {/* Main Content Area */}
         <main className="flex-1 md:ml-64 p-8">{children}</main>
       </div>
     </AdminGuard>

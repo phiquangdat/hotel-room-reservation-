@@ -25,18 +25,18 @@ public class RoomType {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @JsonBackReference(value = "hotel-roomtype")
+    // @JsonBackReference(value = "hotel-roomtype")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "hotel_id", nullable = false)
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
+    // @ToString.Exclude
+    // @EqualsAndHashCode.Exclude
     private Hotel hotel;
 
-    @JsonManagedReference(value = "room-roomtype")
-    @OneToMany(mappedBy = "roomType", cascade = CascadeType.ALL)
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
-    private Set<Room> rooms;
+    // @JsonManagedReference(value = "room-roomtype")
+    // @OneToMany(mappedBy = "roomType", cascade = CascadeType.ALL)
+    // @ToString.Exclude
+    // @EqualsAndHashCode.Exclude
+    // private Set<Room> rooms;
 
     @Column(length = 100, nullable = false)
     private String name;
