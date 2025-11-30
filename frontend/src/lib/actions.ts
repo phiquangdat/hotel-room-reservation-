@@ -1,5 +1,7 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
+
 export interface SearchParams {
   city?: string;
   checkInDate?: string;
@@ -191,13 +193,59 @@ export async function fetchAllRooms(): Promise<BookingRoomProps[]> {
       roomTypeId: String(item.roomType?.id ?? item.roomTypeId ?? "0"),
       roomTypeName: item.roomType?.name ?? item.roomTypeName ?? "Room",
       imageUrl: item.roomType?.imageUrl ?? item.imageUrl ?? "/placeholder.jpg",
+      roomNumber: item.roomNumber ?? "N/A",
       pricePerNight: Number(
         item.roomType?.pricePerNight ?? item.pricePerNight ?? 0
       ),
       capacity: item.roomType?.capacity ?? item.capacity ?? 0,
+      status: data.status ?? "Available",
     }));
   } catch (error) {
     console.error("Failed to fetch all rooms:", error);
     return [];
+  }
+}
+
+export async function deleteRoom(roomId: number) {
+  const url = `${backendUrl}/rooms/${roomId}`;
+  try {
+    const res = await fetch(url, {
+      method: "DELETE",
+    });
+
+    if (!res.ok) {
+      throw new Error(`Failed to delete room: ${res.status}`);
+    }
+
+    revalidatePath("/admin/rooms");
+    return { success: true };
+  } catch (error) {
+    console.error("Failed to delete room:", error);
+    return { error: "Failed to delete room" };
+  }
+}
+
+export async function updateRoom(roomId: number, data: any) {
+  const url = `${backendUrl}/rooms/${roomId}`;
+  try {
+    const res = await fetch(url, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!res.ok) {
+      throw new Error(`Failed to update room: ${res.status}`);
+    }
+
+    const updatedRoom = await res.json();
+    revalidatePath("/admin/rooms");
+    revalidatePath(`/admin/rooms/${roomId}/edit`);
+    return { success: true, data: updatedRoom };
+  } catch (error) {
+    console.error("Failed to update room:", error);
+    return { error: "Failed to update room" };
   }
 }

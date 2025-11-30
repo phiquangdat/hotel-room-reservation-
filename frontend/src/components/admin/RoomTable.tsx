@@ -1,20 +1,38 @@
 "use client";
 import { useState } from "react";
+import Link from "next/link";
 import StatusBadge from "./StatusBadge";
-import { type BookingRoomProps } from "@/lib/actions";
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
+import { deleteRoom, type BookingRoomProps } from "@/lib/actions";
 
 interface RoomTableProps {
   initialRooms: BookingRoomProps[];
 }
 
 export default function RoomTable({ initialRooms }: RoomTableProps) {
-  const [rooms, setRooms] = useState<BookingRoomProps[]>([]);
+  const router = useRouter();
+  const [rooms, setRooms] = useState<BookingRoomProps[]>(initialRooms);
   const [deleteId, setDeleteId] = useState<number | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
-  const handleDelete = (id: number) => {
-    setRooms(rooms.filter((room) => room.roomId !== id));
-    setDeleteId(null);
+  const handleDelete = async (id: number) => {
+    setIsDeleting(true);
+    try {
+      const result = await deleteRoom(id);
+      if (result.error) {
+        toast.error(result.error);
+      } else {
+        toast.success("Room deleted successfully");
+        setRooms((prev) => prev.filter((room) => room.roomId !== id));
+        router.refresh();
+      }
+    } catch (error) {
+      toast.error("An error occurred while deleting");
+    } finally {
+      setIsDeleting(false);
+      setDeleteId(null);
+    }
   };
 
   const formatPrice = (price: number) => {
@@ -23,16 +41,6 @@ export default function RoomTable({ initialRooms }: RoomTableProps) {
       currency: "USD",
     }).format(price);
   };
-
-  if (isLoading) {
-    return (
-      <div className="bg-white rounded-lg shadow p-6">
-        <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <>
@@ -74,7 +82,6 @@ export default function RoomTable({ initialRooms }: RoomTableProps) {
           </div>
         ) : (
           <>
-            {/* Desktop Table */}
             <div className="hidden md:block overflow-x-auto">
               <table className="w-full text-left border">
                 <thead className="bg-gray-50 border-b">
@@ -91,24 +98,27 @@ export default function RoomTable({ initialRooms }: RoomTableProps) {
                 </thead>
                 <tbody>
                   {rooms.map((room) => (
-                    <tr key={room.id} className="border-b hover:bg-gray-50">
+                    <tr key={room.roomId} className="border-b hover:bg-gray-50">
                       <td className="p-3 font-medium text-gray-900">
                         {room.roomNumber}
                       </td>
-                      <td className="p-3 text-gray-700">{room.roomType}</td>
-                      <td className="p-3 text-gray-700">{room.hotel}</td>
+                      <td className="p-3 text-gray-700">{room.roomTypeName}</td>
+                      <td className="p-3 text-gray-700">{room.hotelName}</td>
                       <td className="p-3 font-medium text-gray-900">
-                        {formatPrice(room.price)}
+                        {formatPrice(room.pricePerNight)}
                       </td>
                       <td className="p-3">
                         <StatusBadge status={room.status} />
                       </td>
                       <td className="p-3 text-right space-x-2">
-                        <button className="text-indigo-600 hover:text-indigo-800 hover:underline font-medium">
+                        <Link
+                          href={`/admin/rooms/${room.roomId}/edit`}
+                          className="text-indigo-600 hover:text-indigo-800 hover:underline font-medium"
+                        >
                           Edit
-                        </button>
+                        </Link>
                         <button
-                          onClick={() => setDeleteId(room.id)}
+                          onClick={() => setDeleteId(room.roomId)}
                           className="text-red-600 hover:text-red-800 hover:underline font-medium"
                         >
                           Delete
@@ -123,7 +133,6 @@ export default function RoomTable({ initialRooms }: RoomTableProps) {
         )}
       </div>
 
-      {/* Delete Confirmation Modal */}
       {deleteId !== null && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg p-6 max-w-md w-full">
@@ -137,12 +146,13 @@ export default function RoomTable({ initialRooms }: RoomTableProps) {
             <div className="flex gap-3 justify-end">
               <button
                 onClick={() => setDeleteId(null)}
+                disabled={isDeleting}
                 className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-700 font-medium"
               >
                 Cancel
               </button>
               <button
-                onClick={() => handleDelete(deleteId)}
+                onClick={() => deleteId && handleDelete(deleteId)}
                 className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium"
               >
                 Delete
