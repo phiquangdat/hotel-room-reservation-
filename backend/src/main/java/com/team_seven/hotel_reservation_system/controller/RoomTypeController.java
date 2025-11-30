@@ -9,10 +9,13 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/room-types")
+@CrossOrigin(origins = "*")
 public class RoomTypeController {
+    private final RoomTypeService roomTypeService;
 
-    @Autowired
-    private RoomTypeService roomTypeService;
+    public RoomTypeController(RoomTypeService roomTypeService){
+        this.roomTypeService = roomTypeService;
+    }
 
     @GetMapping
     public List<RoomTypeDto> getAllRoomTypes() {

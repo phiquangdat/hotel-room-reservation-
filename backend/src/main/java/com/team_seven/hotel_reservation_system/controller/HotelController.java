@@ -9,14 +9,23 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/hotels")
+@CrossOrigin(origins = "*")
 public class HotelController {
+    
+    private final HotelService hotelService;
 
-    @Autowired
-    private HotelService hotelService;
+    public HotelController(HotelService hotelService){
+        this.hotelService = hotelService;
+    }
 
     @GetMapping
     public List<HotelDto> getAllHotels() {
         return hotelService.getAll();
+    }
+
+    @GetMapping("/hello")
+    public String getHello() {
+        return "Hello";
     }
 
     @GetMapping("/top-rated")

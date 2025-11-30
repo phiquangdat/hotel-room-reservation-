@@ -15,21 +15,22 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class RoomTypeService {
 
+    private final RoomTypeRepository roomTypeRepository;
+
     @Autowired
-    private RoomTypeRepository roomTypeRepository;
+    public RoomTypeService(RoomTypeRepository roomTypeRepository){
+        this.roomTypeRepository = roomTypeRepository;
+    }
 
     public List<RoomTypeDto> getAll() {
         return roomTypeRepository.findAll().stream()
-            .map(rt -> {
-                Hotel hotel = rt.getHotel();
-                hotel.getName(); 
-                return toDto(rt);
-            })
+            .map(this::toDto) 
             .collect(Collectors.toList());
     }
 
     private RoomTypeDto toDto(RoomType rt) {
         if (rt == null) return null;
+        Hotel hotel = (rt != null) ? rt.getHotel() : null; 
 
         return RoomTypeDto.builder()
                 .id(rt.getId())
@@ -38,8 +39,8 @@ public class RoomTypeService {
                 .description(rt.getDescription())
                 .pricePerNight(rt.getPricePerNight())
                 .capacity(rt.getCapacity())
-                .hotelId(rt.getHotel().getId())
-                .hotelName(rt.getHotel().getName())
+                .hotelId(hotel.getId())
+                .hotelName(hotel.getName())
                 .build();
     }
 }

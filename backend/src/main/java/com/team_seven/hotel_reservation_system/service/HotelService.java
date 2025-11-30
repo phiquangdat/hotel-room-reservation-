@@ -14,8 +14,12 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class HotelService {
 
+    private final HotelRepository hotelRepository;
+
     @Autowired
-    private HotelRepository hotelRepository;
+    public HotelService(HotelRepository hotelRepository) {
+        this.hotelRepository = hotelRepository;
+    }
 
     public List<HotelDto> getAll() {
         return hotelRepository.findAll().stream()
