@@ -1,26 +1,21 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useAuthStore } from "@/lib/auth";
 import { Hotel } from "lucide-react";
-
-interface AuthState {
-  isLoggedIn: boolean;
-  logout: () => void;
-}
-
-const useAuth = (): AuthState => {
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
-
-  const logout = () => {
-    setIsLoggedIn(false);
-  };
-
-  return { isLoggedIn, logout };
-};
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 export default function Navbar() {
-  const { isLoggedIn, logout } = useAuth();
+  const { user, logout } = useAuthStore();
+  const router = useRouter();
+
+  const handleLogout = () => {
+    logout();
+    toast.success("Logged out successfully");
+    router.push("/");
+    router.refresh();
+  };
 
   return (
     <nav className="bg-white sticky top-0 z-50 border-b border-gray-200 shadow-sm">
@@ -37,21 +32,38 @@ export default function Navbar() {
 
         <div className="hidden md:block">
           <div className="ml-10 flex items-center space-x-2">
-            {isLoggedIn ? (
-              <>
-                <Link
-                  href="/bookings"
-                  className="px-4 py-2 rounded-lg text-gray-700 hover:text-indigo-600 hover:bg-indigo-50 transition-all duration-200 font-medium"
-                >
-                  My Bookings
-                </Link>
-                <button
-                  onClick={logout}
-                  className="px-5 py-2 rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:from-indigo-700 hover:to-purple-700 transition-all duration-200 font-medium shadow-md hover:shadow-lg"
-                >
-                  Logout
-                </button>
-              </>
+            {user ? (
+              user.role == "ROLE_ADMIN" ? (
+                <>
+                  <Link
+                    href="/admin/"
+                    className="px-4 py-2 rounded-lg text-gray-700 hover:text-indigo-600 hover:bg-indigo-50 transition-all duration-200 font-medium"
+                  >
+                    Admin Dashboard
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    className="px-5 py-2 rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:from-indigo-700 hover:to-purple-700 transition-all duration-200 font-medium shadow-md hover:shadow-lg"
+                  >
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link
+                    href="/bookings"
+                    className="px-4 py-2 rounded-lg text-gray-700 hover:text-indigo-600 hover:bg-indigo-50 transition-all duration-200 font-medium"
+                  >
+                    My Bookings
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    className="px-5 py-2 rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:from-indigo-700 hover:to-purple-700 transition-all duration-200 font-medium shadow-md hover:shadow-lg"
+                  >
+                    Logout
+                  </button>
+                </>
+              )
             ) : (
               <>
                 <Link

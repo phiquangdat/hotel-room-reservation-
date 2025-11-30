@@ -2,8 +2,13 @@
 
 import { useState } from "react";
 import { Mail, Lock, ArrowRight, AlertCircle } from "lucide-react";
+import toast from "react-hot-toast";
+import { useAuthStore } from "@/lib/auth";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
+  const login = useAuthStore((state) => state.login);
+  const router = useRouter();
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -35,10 +40,17 @@ export default function LoginPage() {
       if (!res.ok) throw new Error(data.message || "Login failed");
 
       if (data.token) {
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("email", data.email);
-        localStorage.setItem("firstName", data.firstName || "");
-        window.location.href = "/"; // redirect to home page on success
+        login(
+          {
+            email: data.email,
+            firstName: data.firstName || "",
+            role: data.role,
+          },
+          data.token
+        );
+        console.log(data);
+        toast.success(`Welcome back, ${data.firstName || "User"}!`);
+        router.push("/"); // redirect to home page on success
       } else {
         throw new Error("Login response did not include a token");
       }
@@ -67,9 +79,9 @@ export default function LoginPage() {
         <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
           <form onSubmit={handleSubmit} className="p-8">
             {error && (
-              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-start gap-3">
+              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-center gap-3">
                 <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-                <span className="text-red-800 text-sm">{error}</span>
+                <span className="text-red-800 text-sm">Try again</span>
               </div>
             )}
 

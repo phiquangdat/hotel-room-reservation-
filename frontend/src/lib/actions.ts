@@ -75,7 +75,7 @@ export async function searchRooms(
       throw new Error(`API request failed with status ${res.status}`);
     }
     const data = await res.json();
-    console.log("SIUU", data);
+
     return data.map((item: any) => ({
       roomId: item.roomId,
       hotelName: item.hotelName,
@@ -168,5 +168,36 @@ export async function createBooking(formData: BookingFormData) {
       return { error: err.message };
     }
     return { error: "An unknown error occurred" };
+  }
+}
+
+export async function fetchAllRooms(): Promise<BookingRoomProps[]> {
+  const url = `${backendUrl}/rooms`;
+  try {
+    const res = await fetch(url, {
+      cache: "no-store",
+    });
+
+    if (!res.ok) {
+      throw new Error(`Failed to fetch rooms: ${res.status}`);
+    }
+
+    const data = await res.json();
+
+    return data.map((item: any) => ({
+      roomId: item.id ?? item.roomId,
+      hotelName:
+        item.roomType?.hotel?.name ?? item.hotelName ?? "Unknown Hotel",
+      roomTypeId: String(item.roomType?.id ?? item.roomTypeId ?? "0"),
+      roomTypeName: item.roomType?.name ?? item.roomTypeName ?? "Room",
+      imageUrl: item.roomType?.imageUrl ?? item.imageUrl ?? "/placeholder.jpg",
+      pricePerNight: Number(
+        item.roomType?.pricePerNight ?? item.pricePerNight ?? 0
+      ),
+      capacity: item.roomType?.capacity ?? item.capacity ?? 0,
+    }));
+  } catch (error) {
+    console.error("Failed to fetch all rooms:", error);
+    return [];
   }
 }

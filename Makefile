@@ -1,5 +1,7 @@
 # Load environment variables from the .env file
 include .env
+# Dynamically set LOCAL_DB_HOST based on environment
+LOCAL_DB_HOST := $(shell if [ "$$(docker compose ps -q db 2>/dev/null)" != "" ]; then echo "db"; else echo "localhost"; fi)
 
 # Get the current directory to mount for backups
 CURRENT_DIR := $(CURDIR)
@@ -36,7 +38,7 @@ db/restore:
 		-e PGPASSWORD=$(LOCAL_DB_PASSWORD) \
 		-v "$(CURRENT_DIR)":/backups \
 		postgres:17 \
-		pg_restore --no-owner --no-privileges -h $(LOCAL_DB_HOST) -p $(LOCAL_DB_PORT) -U $(LOCAL_DB_USER) -d $(LOCAL_DB_NAME) -v /backups/$(BACKUP_FILE) || true
+		pg_restore --no-owner --no-privileges -h localhost -p $(LOCAL_DB_PORT) -U $(LOCAL_DB_USER) -d $(LOCAL_DB_NAME) -v /backups/$(BACKUP_FILE) || true
 	@echo "--> Restore complete."
 
 # Drops, creates, and restores the local database from a snapshot

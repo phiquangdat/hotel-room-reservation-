@@ -2,6 +2,8 @@
 
 import Image from "next/image";
 import { useParams } from "next/navigation";
+import { useSearchStore } from "@/lib/store";
+import { formatDate } from "@/lib/utils";
 import { fetchRoomDetails, type BookingRoomProps } from "@/lib/actions";
 import { useEffect, useState } from "react";
 import {
@@ -24,6 +26,7 @@ import {
 import Link from "next/link";
 
 export default function RoomDetailsPage() {
+  const { checkInDate, checkOutDate, guestCapacity } = useSearchStore();
   const { roomId } = useParams();
   const [room, setRoom] = useState<BookingRoomProps | null>(null);
   const [loading, setLoading] = useState(true);
@@ -284,38 +287,30 @@ export default function RoomDetailsPage() {
                 </p>
               </div>
 
-              <div className="space-y-4 mb-8">
+              <div className="space-y-6 mb-8">
                 <div>
-                  <label className="block text-sm font-semibold text-neutral-300 mb-2">
+                  <label className="block text-sm font-medium text-neutral-400 mb-2">
                     Check-in Date
                   </label>
-                  <input
-                    type="date"
-                    className="w-full px-4 py-4 bg-neutral-900/50 border border-neutral-700 rounded-xl text-white focus:ring-2 focus:ring-white/20 focus:border-transparent transition-all"
-                  />
+                  <div className="text-lg font-semibold text-white">
+                    {formatDate(checkInDate)}
+                  </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-neutral-300 mb-2">
+                  <label className="block text-sm font-medium text-neutral-400 mb-2">
                     Check-out Date
                   </label>
-                  <input
-                    type="date"
-                    className="w-full px-4 py-4 bg-neutral-900/50 border border-neutral-700 rounded-xl text-white focus:ring-2 focus:ring-white/20 focus:border-transparent transition-all"
-                  />
+                  <div className="text-lg font-semibold text-white">
+                    {formatDate(checkOutDate)}
+                  </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-neutral-300 mb-2">
+                  <label className="block text-sm font-medium text-neutral-400 mb-2">
                     Number of Guests
                   </label>
-                  <select className="w-full px-4 py-4 bg-neutral-900/50 border border-neutral-700 rounded-xl text-white focus:ring-2 focus:ring-white/20 focus:border-transparent transition-all">
-                    {Array.from({ length: room.capacity }, (_, i) => i + 1).map(
-                      (num) => (
-                        <option key={num} value={num}>
-                          {num} {num === 1 ? "guest" : "guests"}
-                        </option>
-                      )
-                    )}
-                  </select>
+                  <div className="text-lg font-semibold text-white">
+                    {guestCapacity}
+                  </div>
                 </div>
               </div>
 

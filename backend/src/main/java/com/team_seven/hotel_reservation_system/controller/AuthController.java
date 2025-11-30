@@ -3,7 +3,9 @@ package com.team_seven.hotel_reservation_system.controller;
 import com.team_seven.hotel_reservation_system.dto.AuthResponse;
 import com.team_seven.hotel_reservation_system.dto.LoginRequest;
 import com.team_seven.hotel_reservation_system.models.Customer;
+import com.team_seven.hotel_reservation_system.models.Role;
 import com.team_seven.hotel_reservation_system.repositories.CustomerRepository;
+import com.team_seven.hotel_reservation_system.repositories.RoleRepository;
 import com.team_seven.hotel_reservation_system.util.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,6 +18,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+import java.util.Collections;
+import java.util.HashSet;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -30,6 +34,9 @@ public class AuthController {
     
     @Autowired
     private CustomerRepository customerRepository;
+
+    @Autowired
+    private RoleRepository roleRepository;
 
     @Autowired
     private JwtUtils jwtUtils;
@@ -48,10 +55,13 @@ public class AuthController {
         
         Customer customer = customerRepository.findByEmail(request.getEmail()).orElseThrow();
 
+        String userRole = customer.getRoles().stream().anyMatch(r -> r.getName().equals("ROLE_ADMIN")) ? "ROLE_ADMIN" : "ROLE_USER";
+
         return ResponseEntity.ok(AuthResponse.builder()
                 .token(jwt)
                 .email(customer.getEmail())
                 .firstName(customer.getFirstName())
+                .role(userRole)
                 .build());
     }
 
@@ -63,6 +73,11 @@ public class AuthController {
         }
         
         customer.setPassword(passwordEncoder.encode(customer.getPassword()));
+
+        Role userRole = roleRepository.findByName("ROLE_USER")
+                .orElseThrow(() -> new RuntimeException("Error: Role 'ROLE_USER' is not found."));
+                
+        customer.setRoles(new HashSet<>(Collections.singletonList(userRole)));
         customerRepository.save(customer);
         
         return ResponseEntity.ok(Map.of("message", "User registered successfully"));

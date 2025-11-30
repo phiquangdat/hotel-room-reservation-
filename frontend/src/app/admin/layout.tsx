@@ -1,14 +1,46 @@
-import Sidebar from "../../components/admin/Sidebar";
+import AdminGuard from "@/components/admin/AdminGuard";
+import Link from "next/link";
+import { LayoutDashboard, BedDouble, CalendarCheck } from "lucide-react";
 
 export default function AdminLayout({
-                                        children,
-                                    }: {
-    children: React.ReactNode;
+  children,
+}: {
+  children: React.ReactNode;
 }) {
-    return (
-        <div className="flex min-h-screen bg-gray-100">
-            <Sidebar />
-            <main className="flex-1 p-6">{children}</main>
-        </div>
-    );
+  return (
+    <AdminGuard>
+      <div className="min-h-screen bg-gray-50 flex">
+        {/* Simple Admin Sidebar */}
+        <aside className="w-64 bg-white border-r border-gray-200 hidden md:block fixed h-full">
+          <div className="p-6">
+            <h2 className="text-xl font-bold text-indigo-600">Admin Panel</h2>
+          </div>
+          <nav className="px-4 space-y-2">
+            <Link
+              href="/admin"
+              className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 rounded-lg transition-colors"
+            >
+              <LayoutDashboard className="w-5 h-5" />
+              Dashboard
+            </Link>
+            <Link
+              href="/admin/rooms"
+              className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 rounded-lg transition-colors"
+            >
+              <BedDouble className="w-5 h-5" />
+              Manage Rooms
+            </Link>
+            {/* Future Feature */}
+            <div className="flex items-center gap-3 px-4 py-3 text-gray-400 cursor-not-allowed">
+              <CalendarCheck className="w-5 h-5" />
+              Bookings (Soon)
+            </div>
+          </nav>
+        </aside>
+
+        {/* Main Content Area */}
+        <main className="flex-1 md:ml-64 p-8">{children}</main>
+      </div>
+    </AdminGuard>
+  );
 }
