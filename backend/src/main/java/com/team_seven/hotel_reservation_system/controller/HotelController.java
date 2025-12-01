@@ -23,11 +23,6 @@ public class HotelController {
         return hotelService.getAll();
     }
 
-    @GetMapping("/hello")
-    public String getHello() {
-        return "Hello";
-    }
-
     @GetMapping("/top-rated")
     public List<HotelDto> getTopRatedHotel() {
         return hotelService.getTopRated();

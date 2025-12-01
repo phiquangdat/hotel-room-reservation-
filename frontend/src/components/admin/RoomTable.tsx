@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import StatusBadge from "./StatusBadge";
 import { useRouter } from "next/navigation";
@@ -12,7 +12,6 @@ interface RoomTableProps {
 
 export default function RoomTable({ initialRooms }: RoomTableProps) {
   const router = useRouter();
-  const [rooms, setRooms] = useState<BookingRoomProps[]>(initialRooms);
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -24,7 +23,6 @@ export default function RoomTable({ initialRooms }: RoomTableProps) {
         toast.error(result.error);
       } else {
         toast.success("Room deleted successfully");
-        setRooms((prev) => prev.filter((room) => room.roomId !== id));
         router.refresh();
       }
     } catch (error) {
@@ -41,6 +39,9 @@ export default function RoomTable({ initialRooms }: RoomTableProps) {
       currency: "USD",
     }).format(price);
   };
+
+  const rooms = initialRooms;
+  console.log(rooms);
 
   return (
     <>
@@ -94,6 +95,9 @@ export default function RoomTable({ initialRooms }: RoomTableProps) {
                     <th className="p-3 font-semibold text-gray-900">Hotel</th>
                     <th className="p-3 font-semibold text-gray-900">Price</th>
                     <th className="p-3 font-semibold text-gray-900">Status</th>
+                    <th className="p-3 font-semibold text-gray-900">
+                      Capacity
+                    </th>
                     <th className="p-3 font-semibold text-gray-900 text-right">
                       Actions
                     </th>
@@ -112,6 +116,9 @@ export default function RoomTable({ initialRooms }: RoomTableProps) {
                       </td>
                       <td className="p-3">
                         <StatusBadge status={room.status} />
+                      </td>
+                      <td className="p-3 text-center font-medium text-gray-900">
+                        {room.capacity}
                       </td>
                       <td className="p-3 text-right space-x-4">
                         <Link

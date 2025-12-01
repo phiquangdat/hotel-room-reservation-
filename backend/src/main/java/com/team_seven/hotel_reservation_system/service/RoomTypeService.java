@@ -30,7 +30,10 @@ public class RoomTypeService {
 
     private RoomTypeDto toDto(RoomType rt) {
         if (rt == null) return null;
-        Hotel hotel = (rt != null) ? rt.getHotel() : null; 
+
+        Hotel hotel = rt.getHotel();
+        Long hotelId = (hotel != null) ? hotel.getId() : null;
+        String hotelName = (hotel != null) ? hotel.getName() : null;
 
         return RoomTypeDto.builder()
                 .id(rt.getId())
@@ -39,8 +42,8 @@ public class RoomTypeService {
                 .description(rt.getDescription())
                 .pricePerNight(rt.getPricePerNight())
                 .capacity(rt.getCapacity())
-                .hotelId(hotel.getId())
-                .hotelName(hotel.getName())
+                .hotelId(hotelId)     
+                .hotelName(hotelName)
                 .build();
     }
 }

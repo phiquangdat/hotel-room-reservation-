@@ -3,9 +3,10 @@ import RoomTable from "@/components/admin/RoomTable";
 import { Suspense } from "react";
 import { Loader2 } from "lucide-react";
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminRoomsPage() {
   const rooms = await fetchAllRooms();
-  console.log(rooms);
 
   return (
     <Suspense

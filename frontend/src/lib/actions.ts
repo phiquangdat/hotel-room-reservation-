@@ -21,11 +21,12 @@ export interface Hotel {
 export interface RoomType {
   id: number;
   name: string;
-  hotel: Hotel;
+  imageUrl: string;
+  description: string;
   pricePerNight: number;
   capacity: number;
-  description: string;
-  imageUrl: string;
+  hotelId: string;
+  hotelName: string;
 }
 
 export interface BookingFormData {
@@ -104,9 +105,7 @@ export async function searchRooms(
 
 export async function fetchTopHotels(): Promise<Hotel[]> {
   try {
-    const response = await fetch(`${backendUrl}/hotels/top-rated`, {
-      next: { revalidate: 3600 },
-    });
+    const response = await fetch(`${backendUrl}/hotels/top-rated`);
 
     if (!response.ok) {
       throw new Error("Data could not be fetched!");
@@ -207,7 +206,7 @@ export async function fetchAllRooms(): Promise<BookingRoomProps[]> {
         item.roomType?.pricePerNight ?? item.pricePerNight ?? 0
       ),
       capacity: item.roomType?.capacity ?? item.capacity ?? 0,
-      status: data.status ?? "Available",
+      status: item.status ?? "Available",
     }));
   } catch (error) {
     console.error("Failed to fetch all rooms:", error);
@@ -264,6 +263,7 @@ export async function updateRoom(roomId: number, data: any) {
       headers: {
         "Content-Type": "application/json",
       },
+      cache: "no-store",
       body: JSON.stringify(data),
     });
 
