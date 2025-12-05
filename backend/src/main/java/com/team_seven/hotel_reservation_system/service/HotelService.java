@@ -41,6 +41,52 @@ public class HotelService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
+    public HotelDto getById(Long id) {
+        Hotel hotel = hotelRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Hotel not found with id: " + id));
+        return toDto(hotel);
+    }
+
+    @Transactional
+    public HotelDto create(HotelDto dto) {
+        Hotel hotel = new Hotel();
+        hotel.setName(dto.getName());
+        hotel.setAddress(dto.getAddress());
+        hotel.setCity(dto.getCity());
+        hotel.setPhoneNumber(dto.getPhoneNumber());
+        hotel.setDescription(dto.getDescription());
+        hotel.setRating(dto.getRating());
+
+        Hotel saved = hotelRepository.save(hotel);
+        return toDto(saved);
+    }
+
+    @Transactional
+    public HotelDto update(Long id, HotelDto dto) {
+        Hotel hotel = hotelRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Hotel not found with id: " + id));
+
+        hotel.setName(dto.getName());
+        hotel.setAddress(dto.getAddress());
+        hotel.setCity(dto.getCity());
+        hotel.setPhoneNumber(dto.getPhoneNumber());
+        hotel.setDescription(dto.getDescription());
+        hotel.setRating(dto.getRating());
+
+        Hotel updated = hotelRepository.save(hotel);
+        return toDto(updated);
+    }
+
+    @Transactional
+    public void delete(Long id) {
+        if (!hotelRepository.existsById(id)) {
+            throw new RuntimeException("Hotel not found with id: " + id);
+        }
+        hotelRepository.deleteById(id);
+    }
+
+
     private HotelDto toDto(Hotel h) {
         if (h == null) return null;
         

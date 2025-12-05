@@ -27,4 +27,27 @@ public class HotelController {
     public List<HotelDto> getTopRatedHotel() {
         return hotelService.getTopRated();
     }
+    
+    @GetMapping("/{id}")
+    public HotelDto getHotelById(@PathVariable Long id) {
+        return hotelService.getById(id);
+    }
+
+    @PostMapping
+    public HotelDto createHotel(@RequestBody HotelDto hotelDto) {
+        return hotelService.create(hotelDto);
+    }
+
+    @PutMapping("/{id}")
+    public HotelDto updateHotel(
+            @PathVariable Long id,
+            @RequestBody HotelDto hotelDto
+    ) {
+        return hotelService.update(id, hotelDto);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteHotel(@PathVariable Long id) {
+        hotelService.delete(id);
+    }
 }

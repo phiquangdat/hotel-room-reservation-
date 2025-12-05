@@ -317,3 +317,88 @@ export async function createRoom(data: any, token: string) {
     return { error: "Failed to create room" };
   }
 }
+
+export async function fetchHotelDetails(id: number): Promise<Hotel> {
+  try {
+    const res = await fetch(`${backendUrl}/hotels/${id}`, {
+      cache: "no-store",
+    });
+
+    if (!res.ok) throw new Error("Failed to fetch hotel");
+
+    return await res.json();
+  } catch (error) {
+    console.error("Failed to fetch hotel details:", error);
+    throw new Error("Failed to fetch hotel");
+  }
+}
+
+export async function createHotel(data: Partial<Hotel>) {
+  try {
+    const res = await fetch(`${backendUrl}/hotels`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!res.ok) {
+      throw new Error(`Failed to create hotel: ${res.status}`);
+    }
+
+    const newHotel = await res.json();
+    revalidatePath("/admin/hotels");
+
+    return { success: true, data: newHotel };
+  } catch (error) {
+    console.error("Failed to create hotel:", error);
+    return { error: "Failed to create hotel" };
+  }
+}
+
+export async function updateHotel(hotelId: number, data: Partial<Hotel>) {
+  try {
+    const res = await fetch(`${backendUrl}/hotels/${hotelId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      cache: "no-store",
+      body: JSON.stringify(data),
+    });
+
+    if (!res.ok) {
+      throw new Error(`Failed to update hotel: ${res.status}`);
+    }
+
+    const updatedHotel = await res.json();
+
+    revalidatePath("/admin/hotels");
+    revalidatePath(`/admin/hotels/${hotelId}/edit`);
+
+    return { success: true, data: updatedHotel };
+  } catch (error) {
+    console.error("Failed to update hotel:", error);
+    return { error: "Failed to update hotel" };
+  }
+}
+
+export async function deleteHotel(hotelId: number) {
+  try {
+    const res = await fetch(`${backendUrl}/hotels/${hotelId}`, {
+      method: "DELETE",
+    });
+
+    if (!res.ok) {
+      throw new Error(`Failed to delete hotel: ${res.status}`);
+    }
+
+    revalidatePath("/admin/hotels");
+
+    return { success: true };
+  } catch (error) {
+    console.error("Failed to delete hotel:", error);
+    return { error: "Failed to delete hotel" };
+  }
+}
