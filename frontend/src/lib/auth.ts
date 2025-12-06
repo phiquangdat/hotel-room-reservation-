@@ -10,6 +10,7 @@ interface User {
 interface AuthState {
   user: User | null;
   token: string | null;
+  tokenExpiry: number | null;
   login: (user: User, token: string) => void;
   logout: () => void;
   isAuthenticated: () => boolean;
@@ -20,12 +21,30 @@ export const useAuthStore = create<AuthState>()(
     (set, get) => ({
       user: null,
       token: null,
+      tokenExpiry: null,
 
-      login: (user, token) => set({ user, token }),
+      login: (user, token) => {
+        const expiry = Date.now() + 1000 * 60 * 60;
+        set({ user, token, tokenExpiry: expiry });
 
-      logout: () => set({ user: null, token: null }),
+        setTimeout(() => {
+          if (Date.now() >= expiry) {
+            get().logout();
+          }
+        }, 1000 * 60 * 60 + 1000);
+      },
 
-      isAuthenticated: () => !!get().token,
+      logout: () => set({ user: null, token: null, tokenExpiry: null }),
+
+      isAuthenticated: () => {
+        const { token, tokenExpiry } = get();
+        if (!token || !tokenExpiry) return false;
+        if (Date.now() > tokenExpiry) {
+          get().logout();
+          return false;
+        }
+        return true;
+      },
     }),
     {
       name: "hotel-auth-storage",

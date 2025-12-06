@@ -5,10 +5,12 @@ import { Mail, Lock, ArrowRight, AlertCircle } from "lucide-react";
 import toast from "react-hot-toast";
 import { useAuthStore } from "@/lib/auth";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function LoginPage() {
   const login = useAuthStore((state) => state.login);
   const router = useRouter();
+
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -32,28 +34,26 @@ export default function LoginPage() {
       const res = await fetch(`${backendBase}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: form.email, password: form.password }),
+        body: JSON.stringify(form),
       });
 
       const data = await res.json();
 
       if (!res.ok) throw new Error(data.message || "Login failed");
+      if (!data.token) throw new Error("Login response missing token");
 
-      if (data.token) {
-        login(
-          {
-            email: data.email,
-            firstName: data.firstName || "",
-            role: data.role,
-          },
-          data.token
-        );
-        console.log(data);
-        toast.success(`Welcome back, ${data.firstName || "User"}!`);
-        router.push("/");
-      } else {
-        throw new Error("Login response did not include a token");
-      }
+      login(
+        {
+          email: data.email,
+          firstName: data.firstName || "",
+          role: data.role,
+        },
+        data.token
+      );
+
+      toast.success(`Welcome back, ${data.firstName || "User"}!`);
+      router.push("/");
+      router.refresh();
     } catch (err: unknown) {
       if (err instanceof Error) setError(err.message);
       else setError("An unexpected error occurred");
@@ -81,7 +81,7 @@ export default function LoginPage() {
             {error && (
               <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-center gap-3">
                 <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-                <span className="text-red-800 text-sm">Try again</span>
+                <span className="text-red-800 text-sm">{error}</span>
               </div>
             )}
 
@@ -133,12 +133,12 @@ export default function LoginPage() {
 
           <div className="px-8 py-6 bg-gray-50 border-t border-gray-100 text-center text-sm text-gray-600">
             Don't have an account?{" "}
-            <a
+            <Link
               href="/register"
               className="text-indigo-600 hover:text-indigo-700 font-semibold"
             >
               Sign up for free
-            </a>
+            </Link>
           </div>
         </div>
       </div>

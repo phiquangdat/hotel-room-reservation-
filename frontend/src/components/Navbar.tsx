@@ -1,10 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useAuthStore } from "@/lib/auth";
 import { Hotel } from "lucide-react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import { useAuthStore } from "@/lib/auth";
 
 export default function Navbar() {
   const { user, logout } = useAuthStore();
@@ -13,7 +13,6 @@ export default function Navbar() {
   const handleLogout = () => {
     logout();
     toast.success("Logged out successfully");
-    router.push("/");
     router.refresh();
   };
 
@@ -33,10 +32,10 @@ export default function Navbar() {
         <div className="hidden md:block">
           <div className="ml-10 flex items-center space-x-2">
             {user ? (
-              user.role == "ROLE_ADMIN" ? (
+              user.role === "ROLE_ADMIN" ? (
                 <>
                   <Link
-                    href="/admin/"
+                    href="/admin"
                     className="px-4 py-2 rounded-lg text-gray-700 hover:text-indigo-600 hover:bg-indigo-50 transition-all duration-200 font-medium"
                   >
                     Admin Dashboard

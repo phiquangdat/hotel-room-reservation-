@@ -2,32 +2,33 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useAuthStore } from "@/lib/auth";
 import { Loader2 } from "lucide-react";
+import { useAuthStore } from "@/lib/auth";
 
 export default function AdminGuard({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { user, isAuthenticated } = useAuthStore();
   const router = useRouter();
+  const { user, isAuthenticated } = useAuthStore();
   const [isMounted, setIsMounted] = useState(false);
 
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
+  useEffect(() => setIsMounted(true), []);
 
   useEffect(() => {
-    if (isMounted) {
-      // If not logged in OR not an admin, redirect
-      if (!isAuthenticated() || user?.role !== "ROLE_ADMIN") {
-        router.replace("/"); // Redirect to home or login
-      }
+    if (!isMounted) return;
+
+    if (!isAuthenticated()) {
+      router.replace("/login");
+      return;
     }
-  }, [isMounted, isAuthenticated, user, router]);
 
-  // Show a loading spinner while checking permissions to prevent flashing
+    if (user?.role !== "ROLE_ADMIN") {
+      router.replace("/");
+    }
+  }, [isMounted, user, router, isAuthenticated]);
+
   if (!isMounted || !user || user.role !== "ROLE_ADMIN") {
     return (
       <div className="flex h-[calc(100vh-4rem)] items-center justify-center">
@@ -36,6 +37,5 @@ export default function AdminGuard({
     );
   }
 
-  // If authorized, render the admin page
   return <>{children}</>;
 }
