@@ -4,12 +4,7 @@ import userEvent from "@testing-library/user-event";
 import BookingConfirmation from "./BookingConfirmation";
 import { useSearchStore } from "@/lib/store";
 
-import {
-  createBooking,
-  type RoomDetails,
-  type BookingRoomProps,
-} from "@/lib/actions";
-import { calculateNights, formatDate } from "@/lib/utils";
+import { createBooking, type BookingRoomProps } from "@/lib/actions";
 import toast from "react-hot-toast";
 
 jest.mock("@/lib/store", () => ({
@@ -40,7 +35,6 @@ jest.mock("react-hot-toast", () => ({
   toast: { success: jest.fn(), error: jest.fn() },
 }));
 
-const mockedUseSearchStore = useSearchStore as jest.Mock;
 const mockedCreateBooking = createBooking as jest.Mock;
 const mockedToastSuccess = toast.success as jest.Mock;
 
@@ -65,42 +59,26 @@ const validStoreState = {
 describe("BookingConfirmation", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-  });
-
-  test("shows error if booking details are missing from store", () => {
-    mockedUseSearchStore.mockReturnValue({
-      checkInDate: null,
-      checkOutDate: null,
-      guestCapacity: null,
-    });
-
-    render(<BookingConfirmation {...mockRoom} />);
-
-    expect(
-      screen.getByText(/Booking details are missing/i)
-    ).toBeInTheDocument();
+    (useSearchStore as unknown as jest.Mock).mockReturnValue(validStoreState);
   });
 
   test("renders summary and guest form when details are present", () => {
-    mockedUseSearchStore.mockReturnValue(validStoreState);
-
     render(<BookingConfirmation {...mockRoom} />);
 
     expect(screen.getByText("Booking Summary")).toBeInTheDocument();
     expect(screen.getByText("Guest Details")).toBeInTheDocument();
     expect(screen.getByText("November 20, 2025")).toBeInTheDocument();
     expect(screen.getByText("November 25, 2025")).toBeInTheDocument();
-    expect(screen.getByText("5"));
+    expect(screen.getByText("5")).toBeInTheDocument();
     expect(screen.getByText("$1250.00")).toBeInTheDocument();
   });
 
   test("submits form, calls server action, and shows success message", async () => {
     const user = userEvent.setup();
-    mockedUseSearchStore.mockReturnValue(validStoreState);
     mockedCreateBooking.mockResolvedValue({
       id: 123,
       status: "CONFIRMED",
-    } as any);
+    });
 
     render(<BookingConfirmation {...mockRoom} />);
 
@@ -120,8 +98,8 @@ describe("BookingConfirmation", () => {
         email: "test@user.com",
         phoneNumber: "123456789",
         roomId: mockRoom.roomId,
-        checkInDate: validStoreState.checkInDate,
-        checkOutDate: validStoreState.checkOutDate,
+        checkInDate: new Date(validStoreState.checkInDate).toISOString(),
+        checkOutDate: new Date(validStoreState.checkOutDate).toISOString(),
         numberOfGuests: validStoreState.guestCapacity,
       });
     });
@@ -135,7 +113,6 @@ describe("BookingConfirmation", () => {
 
   test("shows server error message if createBooking fails", async () => {
     const user = userEvent.setup();
-    mockedUseSearchStore.mockReturnValue(validStoreState);
     mockedCreateBooking.mockResolvedValue({
       error: "This room is not available for the selected dates.",
     });

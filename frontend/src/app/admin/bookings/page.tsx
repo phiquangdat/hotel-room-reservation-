@@ -292,7 +292,7 @@ const AdminBookingsPage: React.FC = () => {
                           </div>
                         </td>
                         <td className="px-6 py-4">
-                          {getStatusBadge(b.status)}
+                          {getStatusBadge(b.status ?? "unknown")}
                         </td>
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-2">
@@ -361,7 +361,7 @@ const AdminBookingsPage: React.FC = () => {
                         </p>
                       </div>
                     </div>
-                    {getStatusBadge(b.status)}
+                    {getStatusBadge(b.status ?? "unknown")}
                   </div>
 
                   <div className="space-y-3 mb-4">
