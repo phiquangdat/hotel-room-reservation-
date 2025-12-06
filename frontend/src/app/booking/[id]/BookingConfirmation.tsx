@@ -59,8 +59,8 @@ export default function BookingConfirmation(room: BookingRoomProps) {
         email,
         phoneNumber,
         roomId: roomId,
-        checkInDate: checkInDate,
-        checkOutDate: checkOutDate,
+        checkInDate: new Date(checkInDate).toISOString(),
+        checkOutDate: new Date(checkOutDate).toISOString(),
         numberOfGuests: guestCapacity,
       });
 

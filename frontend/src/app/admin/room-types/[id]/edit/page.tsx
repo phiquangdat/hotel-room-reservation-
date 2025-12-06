@@ -132,7 +132,7 @@ export default function RoomTypeEditPage() {
         imageUrl: form.imageUrl,
         pricePerNight: Number(form.pricePerNight),
         capacity: Number(form.capacity),
-        hotelId: Number(form.hotelId),
+        hotelId: form.hotelId,
       });
       toast.success("Room type updated successfully!");
       router.push("/admin/room-types");

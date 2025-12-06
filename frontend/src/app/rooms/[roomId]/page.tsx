@@ -293,7 +293,7 @@ export default function RoomDetailsPage() {
                     Check-in Date
                   </label>
                   <div className="text-lg font-semibold text-white">
-                    {formatDate(checkInDate)}
+                    {checkInDate ? formatDate(checkInDate) : "N/A"}
                   </div>
                 </div>
                 <div>
@@ -301,7 +301,7 @@ export default function RoomDetailsPage() {
                     Check-out Date
                   </label>
                   <div className="text-lg font-semibold text-white">
-                    {formatDate(checkOutDate)}
+                    {checkOutDate ? formatDate(checkOutDate) : "N/A"}
                   </div>
                 </div>
                 <div>

@@ -42,7 +42,7 @@ export default function RoomTypeNewPage() {
         ...form,
         pricePerNight: Number(form.pricePerNight),
         capacity: Number(form.capacity),
-        hotelId: Number(form.hotelId),
+        hotelId: form.hotelId,
       });
       toast.success("Room type created successfully!");
       router.push("/admin/room-types");

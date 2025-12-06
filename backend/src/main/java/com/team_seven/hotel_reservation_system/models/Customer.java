@@ -47,7 +47,7 @@ public class Customer {
     @EqualsAndHashCode.Exclude
     private Set<Role> roles;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String password;
 }
 

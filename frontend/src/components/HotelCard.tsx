@@ -8,10 +8,13 @@ export default function HotelCard({
   phoneNumber,
   description,
   rating,
+  imageUrl,
 }: Hotel) {
   return (
     <div className="bg-white rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100">
       <div className="relative bg-gradient-to-br from-blue-500 to-purple-600 h-48 flex items-center justify-center">
+        <img src={imageUrl} alt={name} className="w-full h-full object-cover" />
+
         <div className="absolute top-4 right-4 bg-white rounded-full px-3 py-1.5 flex items-center gap-1.5 shadow-lg">
           <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
           <span className="font-bold text-gray-900">{rating}</span>

@@ -58,6 +58,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/hotels/**").permitAll()
                 .requestMatchers("/api/room-types/**").permitAll()
                 .requestMatchers("/api/bookings/**").permitAll()
+                .requestMatchers("/**").permitAll()
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session

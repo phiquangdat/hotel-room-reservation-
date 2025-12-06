@@ -6,6 +6,12 @@ import HotelCard from "@/components/HotelCard";
 import { fetchTopHotels, type Hotel } from "@/lib/actions";
 import { Star } from "lucide-react";
 
+const mockImages = [
+  "https://images.unsplash.com/photo-1560347876-aeef00ee58a1?w=1200&h=800&fit=crop",
+  "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=1200&h=800&fit=crop",
+  "https://images.unsplash.com/photo-1540518614846-7eded433c457?w=1200&h=800&fit=crop",
+];
+
 export default function Home() {
   const [featuredRooms, setFeaturedRooms] = useState<Hotel[]>([]);
 
@@ -71,7 +77,11 @@ export default function Home() {
           {featuredRooms.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {featuredRooms.map((hotel, index) => (
-                <HotelCard key={hotel.id} {...hotel} />
+                <HotelCard
+                  key={hotel.id}
+                  {...hotel}
+                  imageUrl={mockImages[index % mockImages.length]}
+                />
               ))}
             </div>
           ) : (

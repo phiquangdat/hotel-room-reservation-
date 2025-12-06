@@ -16,6 +16,7 @@ export interface Hotel {
   phoneNumber: string;
   description: string;
   rating: number;
+  imageUrl?: string;
 }
 
 export interface RoomType {
