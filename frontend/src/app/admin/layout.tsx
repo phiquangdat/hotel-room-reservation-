@@ -1,6 +1,12 @@
 import AdminGuard from "@/components/admin/AdminGuard";
 import Link from "next/link";
-import { LayoutDashboard, BedDouble, List, Building2 } from "lucide-react";
+import {
+  LayoutDashboard,
+  BedDouble,
+  List,
+  Building2,
+  Calendar,
+} from "lucide-react";
 
 export default function AdminLayout({
   children,
@@ -46,6 +52,14 @@ export default function AdminLayout({
             >
               <List className="w-5 h-5" />
               Manage Room Types
+            </Link>
+
+            <Link
+              href="/admin/bookings"
+              className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 rounded-lg transition-colors"
+            >
+              <Calendar className="w-5 h-5" /> {/* Updated icon */}
+              Manage Bookings
             </Link>
           </nav>
         </aside>

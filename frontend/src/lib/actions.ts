@@ -58,6 +58,29 @@ export interface BookingRoomProps extends RoomCardProps {
   hotelName: string;
 }
 
+export interface Customer {
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  phoneNumber?: string;
+}
+
+export interface Room {
+  roomNumber?: string;
+  roomType?: RoomType;
+}
+
+export interface Booking {
+  id: number;
+  customer?: Customer;
+  room?: Room;
+  checkInDate?: string;
+  checkOutDate?: string;
+  numberOfGuests?: number;
+  totalPrice?: number;
+  status?: string;
+}
+
 // Resolve a consistent backend API base from NEXT_PUBLIC_API_URL.
 // docker-compose sets NEXT_PUBLIC_API_URL=http://backend:8080 so we append /api
 // if it's not already present. Fall back to localhost for local dev.
@@ -465,5 +488,63 @@ export async function deleteRoomType(id: number) {
   } catch (error) {
     console.error("Failed to delete room type:", error);
     return { error: "Failed to delete room type" };
+  }
+}
+
+export async function fetchAllBookings({
+  status = "",
+  page = 0,
+  size = 10,
+}: {
+  status?: string;
+  page?: number;
+  size?: number;
+}) {
+  const query = new URLSearchParams();
+  if (status) query.append("status", status);
+  query.append("page", String(page));
+  query.append("size", String(size));
+
+  const url = `${backendUrl}/bookings?${query.toString()}`;
+  try {
+    const res = await fetch(url, { cache: "no-store" });
+    if (!res.ok) throw new Error("Failed to fetch bookings");
+    return await res.json();
+  } catch (error) {
+    console.error("Failed to fetch bookings:", error);
+    return { content: [], totalPages: 1 };
+  }
+}
+
+export async function updateBookingStatus(id: number, status: string) {
+  try {
+    const res = await fetch(
+      `${backendUrl}/bookings/${id}/status?status=${status}`,
+      {
+        method: "PATCH",
+      }
+    );
+
+    if (!res.ok)
+      throw new Error(`Failed to update booking status: ${res.status}`);
+
+    revalidatePath("/admin/bookings");
+    return await res.json();
+  } catch (error) {
+    console.error("Failed to update booking status:", error);
+    return { error: "Failed to update booking status" };
+  }
+}
+
+export async function fetchBookingById(id: number): Promise<Booking | null> {
+  try {
+    const res = await fetch(`${backendUrl}/bookings/${id}`, {
+      cache: "no-store",
+    });
+    if (!res.ok) throw new Error(`Failed to fetch booking: ${res.status}`);
+    return await res.json();
+  } catch (error) {
+    console.error("Failed to fetch booking:", error);
+    return null;
   }
 }

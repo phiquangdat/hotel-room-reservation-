@@ -11,6 +11,8 @@ import com.team_seven.hotel_reservation_system.service.BookingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.time.temporal.ChronoUnit;
 import java.math.BigDecimal;
@@ -66,5 +68,22 @@ public class BookingServiceImpl implements BookingService {
         newBooking.setTotalPrice(totalPrice);
 
         return bookingRepository.save(newBooking);
+    }
+
+    @Override
+    public Page<Booking> getBookings(String statusFilter, Pageable pageable) {
+        if (statusFilter == null || statusFilter.isEmpty()) {
+            return bookingRepository.findAll(pageable);
+        }
+        return bookingRepository.findAllByStatusContainingIgnoreCase(statusFilter, pageable);
+    }
+
+    @Override
+    @Transactional
+    public Booking updateStatus(Long id, String status) {
+        Booking booking = bookingRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Booking not found with id: " + id));
+        booking.setStatus(status);
+        return bookingRepository.save(booking);
     }
 }
