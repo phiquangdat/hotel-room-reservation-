@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { BedDouble, Plus, Building2 } from "lucide-react";
+import { BedDouble, List, Building2 } from "lucide-react";
 
 export default function AdminDashboard() {
   return (
@@ -12,7 +12,6 @@ export default function AdminDashboard() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        {/* ✅ Manage Rooms */}
         <Link href="/admin/rooms" className="block group">
           <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-all hover:border-indigo-200">
             <div className="w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center text-indigo-600 mb-4 group-hover:scale-110 transition-transform">
@@ -22,22 +21,7 @@ export default function AdminDashboard() {
               Manage Rooms
             </h3>
             <p className="text-gray-500 text-sm mt-2">
-              View, edit, or delete existing rooms.
-            </p>
-          </div>
-        </Link>
-
-        {/* ✅ Add New Room */}
-        <Link href="/admin/rooms/new" className="block group">
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-all hover:border-green-200">
-            <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center text-green-600 mb-4 group-hover:scale-110 transition-transform">
-              <Plus className="w-6 h-6" />
-            </div>
-            <h3 className="text-lg font-semibold text-gray-900">
-              Add New Room
-            </h3>
-            <p className="text-gray-500 text-sm mt-2">
-              Create a new room listing.
+              View, edit, or delete rooms.
             </p>
           </div>
         </Link>
@@ -56,16 +40,16 @@ export default function AdminDashboard() {
           </div>
         </Link>
 
-        <Link href="/admin/hotels/new" className="block group">
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-all hover:border-purple-200">
-            <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center text-purple-600 mb-4 group-hover:scale-110 transition-transform">
-              <Plus className="w-6 h-6" />
+        <Link href="/admin/room-types" className="block group">
+          <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-all hover:border-indigo-200">
+            <div className="w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center text-indigo-600 mb-4 group-hover:scale-110 transition-transform">
+              <List className="w-6 h-6" />
             </div>
             <h3 className="text-lg font-semibold text-gray-900">
-              Add New Hotel
+              Manage Room Types
             </h3>
             <p className="text-gray-500 text-sm mt-2">
-              Register a new hotel property.
+              View, edit, or delete room types.
             </p>
           </div>
         </Link>

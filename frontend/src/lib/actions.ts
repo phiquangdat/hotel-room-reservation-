@@ -402,3 +402,67 @@ export async function deleteHotel(hotelId: number) {
     return { error: "Failed to delete hotel" };
   }
 }
+
+export async function fetchRoomTypeById(id: number) {
+  try {
+    const res = await fetch(`${backendUrl}/room-types/${id}`, {
+      cache: "no-store",
+    });
+    if (!res.ok) throw new Error("Failed to fetch room type");
+    return await res.json();
+  } catch (error) {
+    console.error("Failed to fetch room type:", error);
+    throw error;
+  }
+}
+
+export async function createRoomType(
+  roomType: Omit<RoomType, "id" | "hotelName">
+) {
+  try {
+    const res = await fetch(`${backendUrl}/room-types`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(roomType),
+    });
+    if (!res.ok) throw new Error("Failed to create room type");
+    const data = await res.json();
+    revalidatePath("/admin/room-types");
+    return data;
+  } catch (error) {
+    console.error("Failed to create room type:", error);
+    throw error;
+  }
+}
+
+export async function updateRoomType(id: number, roomType: Partial<RoomType>) {
+  try {
+    const res = await fetch(`${backendUrl}/room-types/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(roomType),
+    });
+    if (!res.ok) throw new Error("Failed to update room type");
+    const data = await res.json();
+    revalidatePath("/admin/room-types");
+    revalidatePath(`/admin/room-types/${id}/edit`);
+    return data;
+  } catch (error) {
+    console.error("Failed to update room type:", error);
+    throw error;
+  }
+}
+
+export async function deleteRoomType(id: number) {
+  try {
+    const res = await fetch(`${backendUrl}/room-types/${id}`, {
+      method: "DELETE",
+    });
+    if (!res.ok) throw new Error("Failed to delete room type");
+    revalidatePath("/admin/room-types");
+    return { success: true };
+  } catch (error) {
+    console.error("Failed to delete room type:", error);
+    return { error: "Failed to delete room type" };
+  }
+}

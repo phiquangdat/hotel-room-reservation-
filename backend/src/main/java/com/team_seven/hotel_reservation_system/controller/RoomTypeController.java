@@ -21,4 +21,23 @@ public class RoomTypeController {
     public List<RoomTypeDto> getAllRoomTypes() {
         return roomTypeService.getAll();
     }
+    @GetMapping("/{id}")
+    public RoomTypeDto getRoomTypeById(@PathVariable Long id) {
+        return roomTypeService.getById(id);
+    }
+
+    @PostMapping
+    public RoomTypeDto createRoomType(@RequestBody RoomTypeDto roomTypeDto) {
+        return roomTypeService.create(roomTypeDto);
+    }
+
+    @PutMapping("/{id}")
+    public RoomTypeDto updateRoomType(@PathVariable Long id, @RequestBody RoomTypeDto roomTypeDto) {
+        return roomTypeService.update(id, roomTypeDto);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteRoomType(@PathVariable Long id) {
+        roomTypeService.delete(id);
+    }
 }
