@@ -16,6 +16,12 @@ export default function Navbar() {
     router.refresh();
   };
 
+  const ADMIN_ROLE = "ROLE_ADMIN";
+  const RECEPTIONIST_ROLE = "ROLE_RECEPTIONIST";
+
+  const isManagementUser =
+    user && (user.role === ADMIN_ROLE || user.role === RECEPTIONIST_ROLE);
+
   return (
     <nav className="bg-white sticky top-0 z-50 border-b border-gray-200 shadow-sm">
       <div className="flex px-16 items-center justify-between h-16">
@@ -32,13 +38,15 @@ export default function Navbar() {
         <div className="hidden md:block">
           <div className="ml-10 flex items-center space-x-2">
             {user ? (
-              user.role === "ROLE_ADMIN" ? (
+              isManagementUser ? (
                 <>
                   <Link
                     href="/admin"
                     className="px-4 py-2 rounded-lg text-gray-700 hover:text-indigo-600 hover:bg-indigo-50 transition-all duration-200 font-medium"
                   >
-                    Admin Dashboard
+                    {user.role === ADMIN_ROLE
+                      ? "Admin Dashboard"
+                      : "Management"}
                   </Link>
                   <button
                     onClick={handleLogout}

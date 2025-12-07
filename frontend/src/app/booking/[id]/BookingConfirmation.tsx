@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSearchStore } from "@/lib/store";
 import { createBooking, type BookingRoomProps } from "@/lib/actions";
 import { calculateNights, formatDate } from "@/lib/utils";
@@ -15,8 +15,16 @@ import {
   CheckCircle2,
 } from "lucide-react";
 
+const useAuthRequiredState = () => {
+  const token = useAuthStore((state) => state.token);
+  const user = useAuthStore((state) => state.user);
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+
+  return { token, user, isAuthenticated };
+};
+
 export default function BookingConfirmation(room: BookingRoomProps) {
-  const { token, isAuthenticated } = useAuthStore();
+  const { user, isAuthenticated } = useAuthRequiredState();
   const { checkInDate, checkOutDate, guestCapacity } = useSearchStore();
 
   const [firstName, setFirstName] = useState("");
@@ -26,6 +34,15 @@ export default function BookingConfirmation(room: BookingRoomProps) {
 
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (isAuthenticated() && user) {
+      setFirstName(user.firstName || "");
+      setLastName(user.lastName || "");
+      setEmail(user.email || "");
+      setPhoneNumber(user.phoneNumber || "");
+    }
+  }, [isAuthenticated, user]);
 
   if (!checkInDate || !checkOutDate || !guestCapacity) {
     return (
@@ -76,19 +93,17 @@ export default function BookingConfirmation(room: BookingRoomProps) {
       }
 
       toast.success("Booking confirmed successfully!");
-      setFirstName("");
-      setLastName("");
-      setEmail("");
-      setPhoneNumber("");
-      window.location.href = `/`;
+      const redirectPath = isAuthenticated() ? `/bookings` : `/`;
+      window.location.href = redirectPath;
     } catch (err) {
       setError("An unexpected error occurred. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
   };
+
   return (
-    <div className="bg-gradient-to-br from-white to-indigo-50/30 rounded-2xl shadow-xl border border-indigo-100/50 overflow-hidden">
+    <div className="bg-gradient-to-br from-white to-indigo-50/30 text-gray-700 rounded-2xl shadow-xl border border-indigo-100/50 overflow-hidden">
       <div className="bg-gradient-to-r from-indigo-600 to-indigo-700 px-6 py-5">
         <h2 className="text-2xl font-bold text-white flex items-center gap-2">
           <CheckCircle2 className="w-6 h-6" />
@@ -176,6 +191,14 @@ export default function BookingConfirmation(room: BookingRoomProps) {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <h3 className="text-lg font-semibold text-gray-900">Guest Details</h3>
+
+          {isAuthenticated() && (
+            <div className="p-3 bg-indigo-50 border border-indigo-300 text-indigo-700 rounded-lg text-sm">
+              Profile information pre-filled from your account. Please confirm
+              or modify details below.
+            </div>
+          )}
+
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label

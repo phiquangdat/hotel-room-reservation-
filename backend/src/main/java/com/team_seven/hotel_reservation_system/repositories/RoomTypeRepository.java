@@ -37,6 +37,7 @@ public interface RoomTypeRepository extends JpaRepository<RoomType, Long> {
         WHERE b.room = r
           AND b.checkInDate < :checkOutDate
           AND b.checkOutDate > :checkInDate
+          AND b.status IN ('CONFIRMED', 'CHECKED_IN')
       )
     GROUP BY r.id, h.name, h.city, rt.name, rt.imageUrl, rt.pricePerNight, rt.capacity
     """)

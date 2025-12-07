@@ -9,7 +9,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import java.net.URI;
+import java.util.List;
 // 7.11
 @RestController
 @RequestMapping("/api/bookings")
@@ -33,6 +36,12 @@ public class BookingController {
             @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size);
         return bookingService.getBookings(status, pageable);
+    }
+
+    @GetMapping("/my-bookings")
+    public List<Booking> getMyBookings(@AuthenticationPrincipal UserDetails userDetails) {
+        String userEmail = userDetails.getUsername(); 
+        return bookingService.getBookingsByCurrentUser(userEmail);
     }
 
     @PatchMapping("/{id}/status")

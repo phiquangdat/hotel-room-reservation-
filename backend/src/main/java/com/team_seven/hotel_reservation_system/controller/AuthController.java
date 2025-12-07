@@ -61,6 +61,8 @@ public class AuthController {
                 .token(jwt)
                 .email(customer.getEmail())
                 .firstName(customer.getFirstName())
+                .lastName(customer.getLastName())
+                .phoneNumber(customer.getPhoneNumber())
                 .role(userRole)
                 .build());
     }

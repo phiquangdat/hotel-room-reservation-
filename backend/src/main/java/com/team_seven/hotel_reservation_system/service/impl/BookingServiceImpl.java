@@ -18,6 +18,7 @@ import org.springframework.data.domain.Pageable;
 import java.time.temporal.ChronoUnit;
 import java.math.BigDecimal;
 import java.util.Optional; 
+import java.util.List;
 
 @Service
 public class BookingServiceImpl implements BookingService {
@@ -98,6 +99,15 @@ public class BookingServiceImpl implements BookingService {
             return bookingRepository.findAll(pageable);
         }
         return bookingRepository.findAllByStatusContainingIgnoreCase(statusFilter, pageable);
+    }
+
+    @Override
+    @Transactional
+    public List<Booking> getBookingsByCurrentUser(String userEmail) {
+        
+        List<Booking> bookings = bookingRepository.findDetailedBookingsByCustomerEmail(userEmail);
+
+        return bookings; 
     }
 
     @Override

@@ -4,10 +4,12 @@ import { persist } from "zustand/middleware";
 interface User {
   email: string;
   firstName: string;
+  lastName: string;
+  phoneNumber: string;
   role: string;
 }
 
-interface AuthState {
+export interface AuthState {
   user: User | null;
   token: string | null;
   tokenExpiry: number | null;

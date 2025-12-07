@@ -689,3 +689,41 @@ export async function fetchBookingById(
     return null;
   }
 }
+
+export async function fetchUserBookings(token: string): Promise<any> {
+  if (!token) {
+    throw new Error("Authentication token is missing for fetchUserBookings.");
+  }
+
+  const url = `${backendUrl}/bookings/my-bookings`;
+
+  try {
+    const res = await fetch(url, {
+      cache: "no-store",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!res.ok) {
+      const errorText = await res.text();
+      throw new Error(
+        `Failed to fetch user bookings: ${res.status} - ${errorText.substring(
+          0,
+          100
+        )}`
+      );
+    }
+
+    const contentType = res.headers.get("content-type");
+    if (!contentType || !contentType.includes("application/json")) {
+      return [];
+    }
+
+    return await res.json();
+  } catch (error) {
+    console.error("Failed to fetch user bookings:", error);
+    throw new Error("Could not retrieve your bookings.");
+  }
+}
