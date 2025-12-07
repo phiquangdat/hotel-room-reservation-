@@ -24,10 +24,13 @@ import {
   FileText,
 } from "lucide-react";
 import Link from "next/link";
+import { useAuthStore } from "@/lib/auth";
 
 export default function EditRoomPage() {
   const { roomId } = useParams();
   const router = useRouter();
+
+  const { token, isAuthenticated } = useAuthStore();
 
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -109,7 +112,13 @@ export default function EditRoomPage() {
     e.preventDefault();
     setIsSaving(true);
 
-    // 1. Find the ID of the selected Room Type
+    // --- 1. AUTHENTICATION CHECK (FIX) ---
+    if (!isAuthenticated() || !token) {
+      toast.error("Session expired. Please log in to update.");
+      setIsSaving(false);
+      return;
+    }
+
     const selectedRoomType = allRoomTypes.find(
       (rt) => rt.name === form.roomTypeName && rt.hotelName === form.hotelName
     );
@@ -121,10 +130,8 @@ export default function EditRoomPage() {
     }
 
     try {
-      const result = await updateRoom(Number(roomId), {
-        // 2. Include the ID in the payload
+      const payload = {
         roomTypeId: selectedRoomType.id,
-
         roomNumber: form.roomNumber,
         roomTypeName: form.roomTypeName,
         hotelName: form.hotelName,
@@ -133,7 +140,9 @@ export default function EditRoomPage() {
         status: form.status,
         description: form.description,
         imageUrl: form.imageUrl,
-      });
+      };
+
+      const result = await updateRoom(Number(roomId), payload, token);
 
       if (result.error) {
         toast.error(result.error);

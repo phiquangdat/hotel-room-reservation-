@@ -6,9 +6,12 @@ import toast from "react-hot-toast";
 import { createRoomType, fetchAllHotels } from "@/lib/actions";
 import { Loader2, ArrowLeft, Plus } from "lucide-react";
 import Link from "next/link";
+import { useAuthStore } from "@/lib/auth";
 
 export default function RoomTypeNewPage() {
   const router = useRouter();
+  const { token, isAuthenticated } = useAuthStore();
+
   const [form, setForm] = useState({
     name: "",
     description: "",
@@ -37,13 +40,26 @@ export default function RoomTypeNewPage() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSaving(true);
+
+    if (!isAuthenticated() || !token) {
+      toast.error("Session expired. Please log in to create a room type.");
+      setIsSaving(false);
+      router.push("/login");
+      return;
+    }
+
     try {
-      await createRoomType({
-        ...form,
+      const payload = {
+        name: form.name,
+        description: form.description,
+        imageUrl: form.imageUrl,
         pricePerNight: Number(form.pricePerNight),
         capacity: Number(form.capacity),
-        hotelId: form.hotelId,
-      });
+        hotelId: Number(form.hotelId),
+      };
+
+      await createRoomType(payload, token);
+
       toast.success("Room type created successfully!");
       router.push("/admin/room-types");
     } catch (err) {

@@ -4,12 +4,15 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { fetchHotelDetails, updateHotel } from "@/lib/actions";
 import toast from "react-hot-toast";
-import { Loader2, ArrowLeft, Save, Building2 } from "lucide-react";
+import { Loader2, ArrowLeft, Save, Building2, X } from "lucide-react";
 import Link from "next/link";
+import { useAuthStore } from "@/lib/auth";
 
 export default function EditHotelPage() {
   const { hotelId } = useParams();
   const router = useRouter();
+
+  const { token, isAuthenticated } = useAuthStore();
 
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -33,7 +36,7 @@ export default function EditHotelPage() {
           name: hotel.name,
           address: hotel.address,
           city: hotel.city,
-          phoneNumber: hotel.phoneNumber,
+          phoneNumber: hotel.phoneNumber || "",
           description: hotel.description || "",
         });
       } catch {
@@ -50,13 +53,26 @@ export default function EditHotelPage() {
     e.preventDefault();
     setIsSaving(true);
 
+    if (!form.name || !form.address || !form.city) {
+      toast.error("Hotel Name, Address, and City are required fields.");
+      setIsSaving(false);
+      return;
+    }
+
+    if (!isAuthenticated() || !token) {
+      toast.error("Session expired. Please log in again to save changes.");
+      setIsSaving(false);
+      router.push("/login");
+      return;
+    }
+
     try {
-      const result = await updateHotel(Number(hotelId), form);
+      const result = await updateHotel(Number(hotelId), form, token);
 
       if (result?.error) {
         toast.error(result.error);
       } else {
-        toast.success("Hotel updated successfully");
+        toast.success(`Hotel ${form.name} updated successfully`);
         router.push("/admin/hotels");
         router.refresh();
       }

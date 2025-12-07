@@ -61,11 +61,15 @@ public class RoomTypeService {
         RoomType rt = roomTypeRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Room type not found"));
 
+        Hotel newHotel = hotelRepository.findById(dto.getHotelId())
+            .orElseThrow(() -> new RuntimeException("Hotel not found")); 
+
         rt.setName(dto.getName());
         rt.setDescription(dto.getDescription());
         rt.setImageUrl(dto.getImageUrl());
-        rt.setPricePerNight(dto.getPricePerNight());
+        rt.setPricePerNight(dto.getPricePerNight()); 
         rt.setCapacity(dto.getCapacity());
+        rt.setHotel(newHotel); 
 
         return toDto(roomTypeRepository.save(rt));
     }

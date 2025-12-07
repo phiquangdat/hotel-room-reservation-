@@ -7,8 +7,8 @@ import {
   fetchRoomTypeById,
   updateRoomType,
   fetchAllHotels,
-  type RoomType,
 } from "@/lib/actions";
+import { useAuthStore } from "@/lib/auth";
 import toast from "react-hot-toast";
 import {
   Loader2,
@@ -24,18 +24,30 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 
-export default function RoomTypeEditPage() {
-  const router = useRouter();
-  const { id } = useParams() as { id: string };
+type FormState = {
+  name: string;
+  description: string;
+  imageUrl: string;
+  pricePerNight: number;
+  capacity: number;
+  hotelId: string;
+};
 
-  const [form, setForm] = useState({
+export default function RoomTypeEditPage() {
+  const { token, isAuthenticated } = useAuthStore();
+  const router = useRouter();
+  const params = useParams();
+  const id = params?.id?.toString();
+
+  const [form, setForm] = useState<FormState>({
     name: "",
     description: "",
     imageUrl: "",
-    pricePerNight: "",
-    capacity: "",
+    pricePerNight: 0,
+    capacity: 0,
     hotelId: "",
   });
+
   const [hotels, setHotels] = useState<{ id: number; name: string }[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -43,41 +55,57 @@ export default function RoomTypeEditPage() {
   const [touched, setTouched] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
+    if (!id) return;
+
     async function loadData() {
+      if (!isAuthenticated() || !token) {
+        toast.error("Session expired. Please log in to load data.");
+        setLoading(false);
+        router.push("/login");
+        return;
+      }
+
       try {
         const [roomType, hotelList] = await Promise.all([
-          fetchRoomTypeById(Number(id)),
+          fetchRoomTypeById(Number(id), token),
           fetchAllHotels(),
         ]);
+
         setForm({
           name: roomType.name,
           description: roomType.description || "",
           imageUrl: roomType.imageUrl || "",
-          pricePerNight: String(roomType.pricePerNight),
-          capacity: String(roomType.capacity),
+          pricePerNight: roomType.pricePerNight,
+          capacity: roomType.capacity,
           hotelId: String(roomType.hotelId),
         });
+
         setHotels(hotelList);
       } catch (err) {
-        toast.error("Failed to load room type or hotels");
+        toast.error("Failed to load data");
         console.error(err);
       } finally {
         setLoading(false);
       }
     }
-    loadData();
-  }, [id]);
 
-  const validateField = (field: string, value: string) => {
+    loadData();
+  }, [id, token]);
+
+  const validateField = (field: string, value: string | number) => {
     switch (field) {
       case "name":
-        return value.trim() ? "" : "Room type name is required";
+        return value ? "" : "Room type name is required";
+
       case "hotelId":
         return value ? "" : "Please select a hotel";
+
       case "pricePerNight":
-        return value && Number(value) > 0 ? "" : "Price must be greater than 0";
+        return Number(value) > 0 ? "" : "Price must be greater than 0";
+
       case "capacity":
-        return value && Number(value) > 0 ? "" : "Capacity must be at least 1";
+        return Number(value) > 0 ? "" : "Capacity must be at least 1";
+
       default:
         return "";
     }
@@ -89,56 +117,73 @@ export default function RoomTypeEditPage() {
     >
   ) => {
     const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
+
+    const parsedValue =
+      name === "pricePerNight" || name === "capacity" ? Number(value) : value;
+
+    setForm((prev) => ({ ...prev, [name]: parsedValue }));
 
     if (touched[name]) {
-      const error = validateField(name, value);
-      setErrors({ ...errors, [name]: error });
+      const error = validateField(name, parsedValue);
+      setErrors((prev) => ({ ...prev, [name]: error }));
     }
   };
 
-  const handleBlur = (field: string) => {
-    setTouched({ ...touched, [field]: true });
-    const error = validateField(field, form[field as keyof typeof form]);
-    setErrors({ ...errors, [field]: error });
+  const handleBlur = (field: keyof FormState) => {
+    setTouched((prev) => ({ ...prev, [field]: true }));
+    const error = validateField(field, form[field]);
+    setErrors((prev) => ({ ...prev, [field]: error }));
   };
 
   const handleSubmit = async () => {
-    // Mark all as touched
     const allTouched = Object.keys(form).reduce(
       (acc, key) => ({ ...acc, [key]: true }),
-      {}
+      {} as Record<string, boolean>
     );
     setTouched(allTouched);
 
-    // Validate all fields
     const newErrors: Record<string, string> = {};
-    Object.keys(form).forEach((key) => {
-      const error = validateField(key, form[key as keyof typeof form]);
+    (Object.keys(form) as (keyof FormState)[]).forEach((key) => {
+      const error = validateField(key, form[key]);
       if (error) newErrors[key] = error;
     });
-    setErrors(newErrors);
 
+    setErrors(newErrors);
     if (Object.keys(newErrors).length > 0) {
-      toast.error("Please fix all errors before saving");
+      toast.error("Fix all errors before saving");
       return;
     }
 
+    if (!id) {
+      toast.error("Invalid room ID");
+      return;
+    }
+
+    if (!isAuthenticated() || !token) {
+      toast.error("Your session has expired. Please log in.");
+      router.push("/login");
+      return;
+    }
+
+    const payload = {
+      name: form.name,
+      description: form.description,
+      imageUrl: form.imageUrl,
+      pricePerNight: form.pricePerNight,
+      capacity: form.capacity,
+      hotelId: Number(form.hotelId),
+    };
+
+    console.log("✅ UPDATE PAYLOAD:", payload);
+
     setSaving(true);
     try {
-      await updateRoomType(Number(id), {
-        name: form.name,
-        description: form.description,
-        imageUrl: form.imageUrl,
-        pricePerNight: Number(form.pricePerNight),
-        capacity: Number(form.capacity),
-        hotelId: form.hotelId,
-      });
+      await updateRoomType(Number(id), payload, token);
       toast.success("Room type updated successfully!");
       router.push("/admin/room-types");
     } catch (err) {
       toast.error("Failed to update room type");
-      console.error(err);
+      console.error("❌ UPDATE FAILED:", err);
     } finally {
       setSaving(false);
     }
@@ -146,9 +191,8 @@ export default function RoomTypeEditPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100">
-        <Loader2 className="w-12 h-12 animate-spin text-blue-600 mb-4" />
-        <p className="text-slate-600 font-medium">Loading room type...</p>
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="w-12 h-12 animate-spin" />
       </div>
     );
   }
@@ -208,7 +252,7 @@ export default function RoomTypeEditPage() {
               >
                 <option value="">Select a hotel...</option>
                 {hotels.map((h) => (
-                  <option key={h.id} value={h.id}>
+                  <option key={h.id} value={String(h.id)}>
                     {h.name}
                   </option>
                 ))}

@@ -26,7 +26,7 @@ export interface RoomType {
   description: string;
   pricePerNight: number;
   capacity: number;
-  hotelId: string;
+  hotelId: number;
   hotelName: string;
 }
 
@@ -80,6 +80,11 @@ export interface Booking {
   totalPrice?: number;
   status?: string;
 }
+
+const getAuthHeaders = (token: string) => ({
+  "Content-Type": "application/json",
+  Authorization: `Bearer ${token}`,
+});
 
 // Resolve a consistent backend API base from NEXT_PUBLIC_API_URL.
 // docker-compose sets NEXT_PUBLIC_API_URL=http://backend:8080 so we append /api
@@ -238,17 +243,47 @@ export async function fetchAllRooms(): Promise<BookingRoomProps[]> {
   }
 }
 
-export async function fetchAllRoomTypes(): Promise<RoomType[]> {
+export async function fetchAllRoomTypes(token?: string): Promise<RoomType[]> {
+  const headers: HeadersInit = {
+    "Content-Type": "application/json",
+  };
+
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
   try {
-    const res = await fetch(`${backendUrl}/room-types`, { cache: "no-store" });
-    if (!res.ok) throw new Error("Failed to fetch room types");
+    const res = await fetch(`${backendUrl}/room-types`, {
+      cache: "no-store",
+      headers: headers,
+    });
+
+    if (!res.ok) {
+      const errorText = await res.text();
+      throw new Error(
+        `Failed to fetch room types: ${res.status} - ${errorText.substring(
+          0,
+          100
+        )}`
+      );
+    }
+
+    const contentType = res.headers.get("content-type");
+    if (
+      res.status === 204 ||
+      !contentType ||
+      !contentType.includes("application/json")
+    ) {
+      return [];
+    }
+
     return await res.json();
   } catch (error) {
-    console.error(error);
+    console.error("Failed to fetch room types:", error);
+    // If we failed due to auth/network, return empty array and let the UI show empty state/error
     return [];
   }
 }
-
 export async function fetchAllHotels(): Promise<Hotel[]> {
   try {
     const res = await fetch(`${backendUrl}/hotels`, { cache: "no-store" });
@@ -279,14 +314,12 @@ export async function deleteRoom(roomId: number) {
   }
 }
 
-export async function updateRoom(roomId: number, data: any) {
+export async function updateRoom(roomId: number, data: any, token: string) {
   const url = `${backendUrl}/rooms/${roomId}`;
   try {
     const res = await fetch(url, {
       method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: getAuthHeaders(token),
       cache: "no-store",
       body: JSON.stringify(data),
     });
@@ -310,8 +343,8 @@ export async function createRoom(data: any, token: string) {
 
   const payload = {
     roomNumber: data.roomNumber,
-    roomTypeName: data.roomType,
-    hotelName: data.hotel,
+    roomTypeId: Number(data.roomTypeId),
+    hotelId: Number(data.hotelId),
     pricePerNight: parseFloat(data.price),
     status: data.status,
     capacity: data.capacity ? parseInt(data.capacity) : 2,
@@ -322,10 +355,7 @@ export async function createRoom(data: any, token: string) {
   try {
     const res = await fetch(url, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
+      headers: getAuthHeaders(token),
       body: JSON.stringify(payload),
     });
 
@@ -357,13 +387,11 @@ export async function fetchHotelDetails(id: number): Promise<Hotel> {
   }
 }
 
-export async function createHotel(data: Partial<Hotel>) {
+export async function createHotel(data: Partial<Hotel>, token: string) {
   try {
     const res = await fetch(`${backendUrl}/hotels`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: getAuthHeaders(token),
       body: JSON.stringify(data),
     });
 
@@ -381,13 +409,15 @@ export async function createHotel(data: Partial<Hotel>) {
   }
 }
 
-export async function updateHotel(hotelId: number, data: Partial<Hotel>) {
+export async function updateHotel(
+  hotelId: number,
+  data: Partial<Hotel>,
+  token: string
+) {
   try {
     const res = await fetch(`${backendUrl}/hotels/${hotelId}`, {
       method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: getAuthHeaders(token),
       cache: "no-store",
       body: JSON.stringify(data),
     });
@@ -408,10 +438,11 @@ export async function updateHotel(hotelId: number, data: Partial<Hotel>) {
   }
 }
 
-export async function deleteHotel(hotelId: number) {
+export async function deleteHotel(hotelId: number, token: string) {
   try {
     const res = await fetch(`${backendUrl}/hotels/${hotelId}`, {
       method: "DELETE",
+      headers: getAuthHeaders(token),
     });
 
     if (!res.ok) {
@@ -427,12 +458,29 @@ export async function deleteHotel(hotelId: number) {
   }
 }
 
-export async function fetchRoomTypeById(id: number) {
+export async function fetchRoomTypeById(id: number, token: string) {
+  if (!token) {
+    throw new Error("Authentication token is missing.");
+  }
+
   try {
     const res = await fetch(`${backendUrl}/room-types/${id}`, {
       cache: "no-store",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     });
-    if (!res.ok) throw new Error("Failed to fetch room type");
+
+    if (!res.ok) {
+      const errorText = await res.text();
+      throw new Error(
+        `Failed to fetch room type: ${res.status} - ${errorText.substring(
+          0,
+          100
+        )}`
+      );
+    }
+
     return await res.json();
   } catch (error) {
     console.error("Failed to fetch room type:", error);
@@ -441,15 +489,33 @@ export async function fetchRoomTypeById(id: number) {
 }
 
 export async function createRoomType(
-  roomType: Omit<RoomType, "id" | "hotelName">
+  roomType: Omit<RoomType, "id" | "hotelName">,
+  token: string
 ) {
+  if (!token) {
+    throw new Error("Authentication token is missing.");
+  }
+
   try {
     const res = await fetch(`${backendUrl}/room-types`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
       body: JSON.stringify(roomType),
     });
-    if (!res.ok) throw new Error("Failed to create room type");
+
+    if (!res.ok) {
+      const errorText = await res.text();
+      throw new Error(
+        `Failed to create room type: ${res.status} - ${errorText.substring(
+          0,
+          100
+        )}`
+      );
+    }
+
     const data = await res.json();
     revalidatePath("/admin/room-types");
     return data;
@@ -459,28 +525,46 @@ export async function createRoomType(
   }
 }
 
-export async function updateRoomType(id: number, roomType: Partial<RoomType>) {
-  try {
-    const res = await fetch(`${backendUrl}/room-types/${id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(roomType),
-    });
-    if (!res.ok) throw new Error("Failed to update room type");
-    const data = await res.json();
-    revalidatePath("/admin/room-types");
-    revalidatePath(`/admin/room-types/${id}/edit`);
-    return data;
-  } catch (error) {
-    console.error("Failed to update room type:", error);
-    throw error;
+export async function updateRoomType(
+  id: number,
+  roomType: Partial<RoomType>,
+  token: string
+) {
+  if (!token) {
+    throw new Error("Authentication token is missing. Please log in.");
   }
+
+  const url = `${backendUrl}/room-types/${id}`;
+  console.log("UPDATE URL:", url, "PAYLOAD:", roomType);
+
+  const res = await fetch(url, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(roomType),
+    cache: "no-store",
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Failed to update room type: ${res.status} - ${text}`);
+  }
+
+  const data = await res.json();
+
+  revalidatePath("/admin/room-types");
+  revalidatePath(`/admin/room-types/${id}/edit`);
+
+  return data;
 }
 
-export async function deleteRoomType(id: number) {
+export async function deleteRoomType(id: number, token: string) {
   try {
     const res = await fetch(`${backendUrl}/room-types/${id}`, {
       method: "DELETE",
+      headers: getAuthHeaders(token),
     });
     if (!res.ok) throw new Error("Failed to delete room type");
     revalidatePath("/admin/room-types");
@@ -491,24 +575,54 @@ export async function deleteRoomType(id: number) {
   }
 }
 
-export async function fetchAllBookings({
-  status = "",
-  page = 0,
-  size = 10,
-}: {
-  status?: string;
-  page?: number;
-  size?: number;
-}) {
+export async function fetchAllBookings(
+  {
+    status = "",
+    page = 0,
+    size = 10,
+  }: {
+    status?: string;
+    page?: number;
+    size?: number;
+  },
+  token: string
+) {
+  if (!token) {
+    console.error("Authentication token is missing for fetchAllBookings.");
+    return { content: [], totalPages: 1 };
+  }
+
   const query = new URLSearchParams();
   if (status) query.append("status", status);
   query.append("page", String(page));
   query.append("size", String(size));
 
   const url = `${backendUrl}/bookings?${query.toString()}`;
+
   try {
-    const res = await fetch(url, { cache: "no-store" });
-    if (!res.ok) throw new Error("Failed to fetch bookings");
+    const res = await fetch(url, {
+      cache: "no-store",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!res.ok) {
+      const errorText = await res.text();
+      throw new Error(
+        `Failed to fetch bookings: ${res.status} - ${errorText.substring(
+          0,
+          100
+        )}`
+      );
+    }
+
+    const contentType = res.headers.get("content-type");
+    if (!contentType || !contentType.includes("application/json")) {
+      return { content: [], totalPages: 1 };
+    }
+
     return await res.json();
   } catch (error) {
     console.error("Failed to fetch bookings:", error);
@@ -516,12 +630,17 @@ export async function fetchAllBookings({
   }
 }
 
-export async function updateBookingStatus(id: number, status: string) {
+export async function updateBookingStatus(
+  id: number,
+  status: string,
+  token: string
+) {
   try {
     const res = await fetch(
       `${backendUrl}/bookings/${id}/status?status=${status}`,
       {
         method: "PATCH",
+        headers: getAuthHeaders(token),
       }
     );
 
@@ -536,12 +655,28 @@ export async function updateBookingStatus(id: number, status: string) {
   }
 }
 
-export async function fetchBookingById(id: number): Promise<Booking | null> {
+export async function fetchBookingById(
+  id: number,
+  token: string
+): Promise<Booking | null> {
+  if (!token) {
+    console.error("Authentication token is missing for fetchBookingById.");
+    return null;
+  }
+
   try {
     const res = await fetch(`${backendUrl}/bookings/${id}`, {
       cache: "no-store",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     });
-    if (!res.ok) throw new Error(`Failed to fetch booking: ${res.status}`);
+
+    if (!res.ok) {
+      console.error(`API request failed with status ${res.status}`);
+      return null;
+    }
+
     return await res.json();
   } catch (error) {
     console.error("Failed to fetch booking:", error);

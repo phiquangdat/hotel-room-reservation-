@@ -21,6 +21,8 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import org.springframework.http.HttpMethod;
+
 import java.util.List;
 
 @Configuration
@@ -65,10 +67,13 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/public/**").permitAll()
-                        .requestMatchers("/api/rooms/**").permitAll()
+                        .requestMatchers("/api/rooms/**").permitAll() 
                         .requestMatchers("/api/hotels/**").permitAll()
-                        .requestMatchers("/api/room-types/**").permitAll()
-                        .requestMatchers("/api/bookings/**").permitAll()
+                        
+                        .requestMatchers(HttpMethod.POST, "/api/room-types").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/api/room-types/**").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/api/room-types/**").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/bookings/**").authenticated()
                         .anyRequest().authenticated()
                 )
 

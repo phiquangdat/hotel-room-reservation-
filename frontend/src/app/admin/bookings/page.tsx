@@ -18,8 +18,11 @@ import {
   CalendarCheck,
   Bed,
 } from "lucide-react";
+import { useAuthStore } from "@/lib/auth";
 
 const AdminBookingsPage: React.FC = () => {
+  const { token, isAuthenticated } = useAuthStore();
+
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [statusFilter, setStatusFilter] = useState<string>("");
@@ -31,11 +34,17 @@ const AdminBookingsPage: React.FC = () => {
   const loadBookings = async () => {
     try {
       setLoading(true);
-      const data = await fetchAllBookings({
-        status: statusFilter,
-        page,
-        size: pageSize,
-      });
+      if (!isAuthenticated || !token) {
+        return;
+      }
+      const data = await fetchAllBookings(
+        {
+          status: statusFilter,
+          page,
+          size: pageSize,
+        },
+        token
+      );
 
       // Normalize bookings to ensure customer and room exist
       const normalizedBookings = data.content.map((b: any) => ({
@@ -66,9 +75,14 @@ const AdminBookingsPage: React.FC = () => {
   }, [statusFilter, page]);
 
   const handleStatusChange = async (id: number, status: string) => {
+    if (!isAuthenticated() || !token) {
+      alert("Session expired. Please log in again.");
+      return;
+    }
+
     try {
       setUpdatingId(id);
-      await updateBookingStatus(id, status);
+      await updateBookingStatus(id, status, token);
       await loadBookings();
     } catch (error) {
       console.error(error);

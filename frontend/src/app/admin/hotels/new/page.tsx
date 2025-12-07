@@ -4,10 +4,13 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createHotel } from "@/lib/actions";
 import toast from "react-hot-toast";
+import { useAuthStore } from "@/lib/auth";
 
 export default function AddHotelPage() {
   const router = useRouter();
   const [isSaving, setIsSaving] = useState(false);
+
+  const { token, isAuthenticated } = useAuthStore();
 
   const [form, setForm] = useState({
     name: "",
@@ -63,10 +66,15 @@ export default function AddHotelPage() {
       return;
     }
 
+    if (!isAuthenticated() || !token) {
+      toast.error("Session expired. Please log in to create a hotel.");
+      return;
+    }
+
     setIsSaving(true);
 
     try {
-      const result = await createHotel(form);
+      const result = await createHotel(form, token);
 
       if (result?.error) {
         toast.error(result.error);

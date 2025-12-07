@@ -4,15 +4,25 @@ import { useEffect, useState } from "react";
 import RoomTypeTable from "@/components/admin/RoomTypeTable";
 import { fetchAllRoomTypes, type RoomType } from "@/lib/actions";
 import { Loader2 } from "lucide-react";
+import { useAuthStore } from "@/lib/auth";
 
 export default function RoomTypesAdminPage() {
+  const { token, isAuthenticated } = useAuthStore();
+
   const [roomTypes, setRoomTypes] = useState<RoomType[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function loadRoomTypes() {
+      if (!isAuthenticated() || !token) {
+        console.error("Authentication failed or token missing.");
+        setLoading(false);
+
+        return;
+      }
+
       try {
-        const data: RoomType[] = await fetchAllRoomTypes();
+        const data: RoomType[] = await fetchAllRoomTypes(token);
         setRoomTypes(data);
       } catch (err) {
         console.error("Failed to fetch room types:", err);
@@ -22,7 +32,7 @@ export default function RoomTypesAdminPage() {
     }
 
     loadRoomTypes();
-  }, []);
+  }, [token, isAuthenticated]);
 
   if (loading) {
     return (
