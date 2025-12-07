@@ -41,7 +41,7 @@ export default function Navbar() {
               isManagementUser ? (
                 <>
                   <Link
-                    href="/admin"
+                    href={user.role === ADMIN_ROLE ? "/admin" : "/management"}
                     className="px-4 py-2 rounded-lg text-gray-700 hover:text-indigo-600 hover:bg-indigo-50 transition-all duration-200 font-medium"
                   >
                     {user.role === ADMIN_ROLE

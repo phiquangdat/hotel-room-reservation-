@@ -93,12 +93,15 @@ public class BookingServiceImpl implements BookingService {
         return savedBooking;
     }
 
-    @Override
+   @Override
+    @Transactional(readOnly = true)
     public Page<Booking> getBookings(String statusFilter, Pageable pageable) {
+        
         if (statusFilter == null || statusFilter.isEmpty()) {
-            return bookingRepository.findAll(pageable);
+            return bookingRepository.findAllWithDetails(pageable); 
+        } else {
+            return bookingRepository.findAllByStatusContainingIgnoreCaseWithDetails(statusFilter, pageable);
         }
-        return bookingRepository.findAllByStatusContainingIgnoreCase(statusFilter, pageable);
     }
 
     @Override

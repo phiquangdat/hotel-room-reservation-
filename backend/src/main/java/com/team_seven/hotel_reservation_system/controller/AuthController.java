@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 import java.util.Collections;
+import java.util.stream.Collectors;
 import java.util.HashSet;
 
 @RestController
@@ -55,7 +56,16 @@ public class AuthController {
         
         Customer customer = customerRepository.findByEmail(request.getEmail()).orElseThrow();
 
-        String userRole = customer.getRoles().stream().anyMatch(r -> r.getName().equals("ROLE_ADMIN")) ? "ROLE_ADMIN" : "ROLE_USER";
+        String userRole = customer.getRoles().stream()
+                .map(Role::getName)
+                .filter(name -> name.equals("ROLE_ADMIN"))
+                .findFirst()
+                .orElse(customer.getRoles().stream() 
+                        .map(Role::getName)
+                        .filter(name -> name.equals("ROLE_RECEPTIONIST"))
+                        .findFirst()
+                        .orElse("ROLE_USER")
+                );
 
         return ResponseEntity.ok(AuthResponse.builder()
                 .token(jwt)
