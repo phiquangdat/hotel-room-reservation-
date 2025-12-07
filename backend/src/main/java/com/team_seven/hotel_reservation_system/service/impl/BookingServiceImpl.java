@@ -84,8 +84,9 @@ public class BookingServiceImpl implements BookingService {
         newBooking.setTotalPrice(totalPrice);
 
         Booking savedBooking = bookingRepository.save(newBooking);
+        String roomStatus = room.getStatus();
         
-        if (room.getStatus().equalsIgnoreCase(ROOM_STATUS_AVAILABLE)) {
+        if (roomStatus != null && roomStatus.equalsIgnoreCase(ROOM_STATUS_AVAILABLE)) {
             room.setStatus(ROOM_STATUS_BOOKED); 
             roomRepository.save(room);
         }
