@@ -185,19 +185,26 @@ export async function fetchRoomDetails(id: string): Promise<BookingRoomProps> {
   }
 }
 
-export async function createBooking(formData: BookingFormData) {
+export async function createBooking(formData: BookingFormData, token?: string) {
   const url = `${backendUrl}/bookings`;
+
+  const headers: HeadersInit = {
+    "Content-Type": "application/json",
+  };
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
   try {
     const res = await fetch(url, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: headers,
       body: JSON.stringify(formData),
     });
 
     if (!res.ok) {
-      throw new Error("Failed to create booking");
+      const errorText = await res.text();
+      throw new Error(`Failed to create booking: ${res.status} - ${errorText}`);
     }
 
     const newBooking = await res.json();
@@ -206,10 +213,9 @@ export async function createBooking(formData: BookingFormData) {
     if (err instanceof Error) {
       return { error: err.message };
     }
-    return { error: "An unknown error occurred" };
+    return { error: "An unknown error occurred during booking." };
   }
 }
-
 export async function fetchAllRooms(): Promise<BookingRoomProps[]> {
   const url = `${backendUrl}/rooms`;
   try {

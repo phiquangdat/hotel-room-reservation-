@@ -69,6 +69,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/public/**").permitAll()
                         .requestMatchers("/api/rooms/**").permitAll() 
                         .requestMatchers("/api/hotels/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/bookings").permitAll()
                         
                         .requestMatchers(HttpMethod.POST, "/api/room-types").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/api/room-types/**").authenticated()

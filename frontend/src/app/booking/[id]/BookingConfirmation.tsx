@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useSearchStore } from "@/lib/store";
 import { createBooking, type BookingRoomProps } from "@/lib/actions";
 import { calculateNights, formatDate } from "@/lib/utils";
+import { useAuthStore } from "@/lib/auth";
 import toast from "react-hot-toast";
 import {
   CalendarDays,
@@ -15,6 +16,7 @@ import {
 } from "lucide-react";
 
 export default function BookingConfirmation(room: BookingRoomProps) {
+  const { token, isAuthenticated } = useAuthStore();
   const { checkInDate, checkOutDate, guestCapacity } = useSearchStore();
 
   const [firstName, setFirstName] = useState("");
@@ -47,13 +49,15 @@ export default function BookingConfirmation(room: BookingRoomProps) {
     setIsSubmitting(true);
     setError(null);
 
+    const currentToken = useAuthStore.getState().token;
+
     try {
       if (!firstName || !lastName || !email || !phoneNumber) {
         setError("Please fill in all guest details.");
         return;
       }
 
-      const result = await createBooking({
+      const payload = {
         firstName,
         lastName,
         email,
@@ -62,7 +66,9 @@ export default function BookingConfirmation(room: BookingRoomProps) {
         checkInDate: new Date(checkInDate).toISOString(),
         checkOutDate: new Date(checkOutDate).toISOString(),
         numberOfGuests: guestCapacity,
-      });
+      };
+
+      const result = await createBooking(payload, currentToken || undefined);
 
       if (result?.error) {
         setError(result.error);

@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { deleteHotel, type Hotel } from "@/lib/actions";
+import { useAuthStore } from "@/lib/auth";
+import { Loader2, Pencil, Trash2 } from "lucide-react";
 
 interface HotelTableProps {
   initialHotels: Hotel[];
@@ -12,15 +14,24 @@ interface HotelTableProps {
 
 export default function HotelTable({ initialHotels }: HotelTableProps) {
   const router = useRouter();
+
+  const { token, isAuthenticated } = useAuthStore();
+
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
   const hotels = initialHotels;
 
   const handleDelete = async (id: number) => {
+    if (!isAuthenticated() || !token) {
+      toast.error("Session expired. Please log in to delete.");
+      setDeleteId(null);
+      return;
+    }
+
     setIsDeleting(true);
     try {
-      const result = await deleteHotel(id);
+      const result = await deleteHotel(id, token);
 
       if (result?.error) {
         toast.error(result.error);
@@ -92,14 +103,21 @@ export default function HotelTable({ initialHotels }: HotelTableProps) {
                       <td className="p-3 text-right space-x-4">
                         <Link
                           href={`/admin/hotels/${hotel.id}/edit`}
-                          className="text-indigo-600 hover:text-indigo-800 hover:underline font-medium"
+                          className="text-indigo-600 hover:text-indigo-800 hover:underline font-medium inline-flex items-center gap-1"
                         >
+                          <Pencil className="w-4 h-4" />
                           Edit
                         </Link>
                         <button
                           onClick={() => setDeleteId(hotel.id)}
-                          className="text-red-600 hover:text-red-800 hover:underline font-medium"
+                          className="text-red-600 hover:text-red-800 hover:underline font-medium inline-flex items-center gap-1"
+                          disabled={isDeleting && deleteId === hotel.id}
                         >
+                          {isDeleting && deleteId === hotel.id ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <Trash2 className="w-4 h-4" />
+                          )}
                           Delete
                         </button>
                       </td>
@@ -134,6 +152,7 @@ export default function HotelTable({ initialHotels }: HotelTableProps) {
               <button
                 onClick={() => deleteId && handleDelete(deleteId)}
                 className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium"
+                disabled={isDeleting}
               >
                 {isDeleting ? "Deleting..." : "Delete"}
               </button>
