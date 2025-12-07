@@ -92,16 +92,19 @@ describe("BookingConfirmation", () => {
 
     await waitFor(() => {
       expect(mockedCreateBooking).toHaveBeenCalledTimes(1);
-      expect(mockedCreateBooking).toHaveBeenCalledWith({
-        firstName: "Test",
-        lastName: "User",
-        email: "test@user.com",
-        phoneNumber: "123456789",
-        roomId: mockRoom.roomId,
-        checkInDate: new Date(validStoreState.checkInDate).toISOString(),
-        checkOutDate: new Date(validStoreState.checkOutDate).toISOString(),
-        numberOfGuests: validStoreState.guestCapacity,
-      });
+      expect(mockedCreateBooking).toHaveBeenCalledWith(
+        {
+          firstName: "Test",
+          lastName: "User",
+          email: "test@user.com",
+          phoneNumber: "123456789",
+          roomId: mockRoom.roomId,
+          checkInDate: new Date(validStoreState.checkInDate).toISOString(),
+          checkOutDate: new Date(validStoreState.checkOutDate).toISOString(),
+          numberOfGuests: validStoreState.guestCapacity,
+        },
+        undefined
+      );
     });
 
     await waitFor(() => {
