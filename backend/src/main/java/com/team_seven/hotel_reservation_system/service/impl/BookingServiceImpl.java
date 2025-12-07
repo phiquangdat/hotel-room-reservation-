@@ -7,6 +7,7 @@ import com.team_seven.hotel_reservation_system.models.Room;
 import com.team_seven.hotel_reservation_system.repositories.BookingRepository;
 import com.team_seven.hotel_reservation_system.repositories.CustomerRepository;
 import com.team_seven.hotel_reservation_system.repositories.RoomRepository;
+import com.team_seven.hotel_reservation_system.repositories.RoomTypeRepository; 
 import com.team_seven.hotel_reservation_system.service.BookingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,15 @@ import java.util.Optional;
 @Service
 public class BookingServiceImpl implements BookingService {
     
+    private static final String ROOM_STATUS_AVAILABLE = "AVAILABLE";
+    private static final String ROOM_STATUS_BOOKED = "BOOKED";
+    private static final String ROOM_STATUS_OCCUPIED = "OCCUPIED";
+    
+    private static final String BOOKING_STATUS_CHECKED_IN = "CHECKED_IN";
+    private static final String BOOKING_STATUS_CHECKED_OUT = "CHECKED_OUT";
+    private static final String BOOKING_STATUS_CANCELLED = "CANCELLED";
+
+
     @Autowired
     private CustomerRepository customerRepository;
 
@@ -30,9 +40,20 @@ public class BookingServiceImpl implements BookingService {
     @Autowired
     private RoomRepository roomRepository;
     
+    @Autowired
+    private RoomTypeRepository roomTypeRepository; 
+    
     @Override
     @Transactional 
     public Booking createBooking(GuestBookingRequestDto dto) { 
+        long numberOfNights = ChronoUnit.DAYS.between(dto.getCheckInDate(), dto.getCheckOutDate());
+        if (numberOfNights <= 0) {
+            throw new IllegalArgumentException("Check-out date must be after check-in date");
+        }
+        
+        Room room = roomRepository.findById(dto.getRoomId()) 
+            .orElseThrow(() -> new RuntimeException("Room not found with id: " + dto.getRoomId()));
+
         Optional<Customer> existingCustomer = customerRepository.findByEmail(dto.getEmail());
         
         Customer customerToUse;
@@ -47,8 +68,8 @@ public class BookingServiceImpl implements BookingService {
             customerToUse = customerRepository.save(newCustomer);
         }
 
-        Room room = roomRepository.findById(dto.getRoomId()) 
-            .orElseThrow(() -> new RuntimeException("Room not found with id: " + dto.getRoomId()));
+        BigDecimal pricePerNight = room.getRoomType().getPricePerNight(); 
+        BigDecimal totalPrice = pricePerNight.multiply(BigDecimal.valueOf(numberOfNights));
 
         Booking newBooking = new Booking();
         newBooking.setCustomer(customerToUse); 
@@ -56,18 +77,19 @@ public class BookingServiceImpl implements BookingService {
         newBooking.setCheckInDate(dto.getCheckInDate());
         newBooking.setCheckOutDate(dto.getCheckOutDate());
         newBooking.setNumberOfGuests(dto.getNumberOfGuests());
-        newBooking.setStatus("CONFIRMED");
-
-        long numberOfNights = ChronoUnit.DAYS.between(dto.getCheckInDate(), dto.getCheckOutDate());
-        if (numberOfNights <= 0) {
-            throw new IllegalArgumentException("Check-out date must be after check-in date");
-        }
         
-        BigDecimal pricePerNight = room.getRoomType().getPricePerNight(); 
-        BigDecimal totalPrice = pricePerNight.multiply(BigDecimal.valueOf(numberOfNights));
+        newBooking.setStatus("CONFIRMED"); 
+        
         newBooking.setTotalPrice(totalPrice);
 
-        return bookingRepository.save(newBooking);
+        Booking savedBooking = bookingRepository.save(newBooking);
+        
+        if (room.getStatus().equalsIgnoreCase(ROOM_STATUS_AVAILABLE)) {
+            room.setStatus(ROOM_STATUS_BOOKED); 
+            roomRepository.save(room);
+        }
+        
+        return savedBooking;
     }
 
     @Override
@@ -80,10 +102,23 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional
-    public Booking updateStatus(Long id, String status) {
+    public Booking updateStatus(Long id, String status) { 
         Booking booking = bookingRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Booking not found with id: " + id));
-        booking.setStatus(status);
-        return bookingRepository.save(booking);
+        
+        Room room = booking.getRoom();
+        
+        booking.setStatus(status.toUpperCase());
+        Booking updatedBooking = bookingRepository.save(booking);
+
+        if (status.equalsIgnoreCase(BOOKING_STATUS_CHECKED_IN)) {
+            room.setStatus(ROOM_STATUS_OCCUPIED);
+            roomRepository.save(room);
+        } else if (status.equalsIgnoreCase(BOOKING_STATUS_CHECKED_OUT) || status.equalsIgnoreCase(BOOKING_STATUS_CANCELLED)) {
+            room.setStatus(ROOM_STATUS_AVAILABLE); 
+            roomRepository.save(room);
+        }
+        
+        return updatedBooking;
     }
 }

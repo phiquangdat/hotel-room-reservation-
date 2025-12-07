@@ -5,8 +5,6 @@ import type { Booking } from "@/lib/actions";
 import {
   Calendar,
   Users,
-  Mail,
-  Phone,
   DollarSign,
   Filter,
   ChevronLeft,
@@ -16,7 +14,6 @@ import {
   X,
   Loader2,
   CalendarCheck,
-  Bed,
 } from "lucide-react";
 import { useAuthStore } from "@/lib/auth";
 
@@ -34,7 +31,8 @@ const AdminBookingsPage: React.FC = () => {
   const loadBookings = async () => {
     try {
       setLoading(true);
-      if (!isAuthenticated || !token) {
+      if (!isAuthenticated() || !token) {
+        setLoading(false);
         return;
       }
       const data = await fetchAllBookings(
@@ -46,7 +44,6 @@ const AdminBookingsPage: React.FC = () => {
         token
       );
 
-      // Normalize bookings to ensure customer and room exist
       const normalizedBookings = data.content.map((b: any) => ({
         ...b,
         customer: b.customer || {
@@ -72,7 +69,7 @@ const AdminBookingsPage: React.FC = () => {
 
   useEffect(() => {
     loadBookings();
-  }, [statusFilter, page]);
+  }, [statusFilter, page, token, isAuthenticated]);
 
   const handleStatusChange = async (id: number, status: string) => {
     if (!isAuthenticated() || !token) {
@@ -122,7 +119,6 @@ const AdminBookingsPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
         <div className="mb-8">
           <div className="flex items-center gap-4 mb-4">
             <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center shadow-lg">
@@ -139,7 +135,6 @@ const AdminBookingsPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Filter Section */}
         <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-6 mb-6">
           <div className="flex items-center gap-4">
             <Filter className="w-5 h-5 text-slate-600" />
@@ -195,7 +190,6 @@ const AdminBookingsPage: React.FC = () => {
           </div>
         ) : (
           <>
-            {/* Table View */}
             <div className="hidden lg:block bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full">
@@ -203,15 +197,6 @@ const AdminBookingsPage: React.FC = () => {
                     <tr className="bg-gradient-to-r from-slate-50 to-slate-100 border-b-2 border-slate-200">
                       <th className="px-6 py-4 text-left text-xs font-bold text-slate-700 uppercase tracking-wider">
                         ID
-                      </th>
-                      <th className="px-6 py-4 text-left text-xs font-bold text-slate-700 uppercase tracking-wider">
-                        Guest
-                      </th>
-                      <th className="px-6 py-4 text-left text-xs font-bold text-slate-700 uppercase tracking-wider">
-                        Contact
-                      </th>
-                      <th className="px-6 py-4 text-left text-xs font-bold text-slate-700 uppercase tracking-wider">
-                        Room
                       </th>
                       <th className="px-6 py-4 text-left text-xs font-bold text-slate-700 uppercase tracking-wider">
                         Dates
@@ -241,40 +226,7 @@ const AdminBookingsPage: React.FC = () => {
                             #{b.id}
                           </span>
                         </td>
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center text-white font-bold">
-                              {b.customer?.firstName?.[0] ?? "-"}
-                              {b.customer?.lastName?.[0] ?? "-"}
-                            </div>
-                            <div>
-                              <p className="text-sm font-semibold text-slate-900">
-                                {b.customer?.firstName ?? "-"}{" "}
-                                {b.customer?.lastName ?? "-"}
-                              </p>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="space-y-1">
-                            <div className="flex items-center gap-2 text-sm text-slate-700">
-                              <Mail className="w-4 h-4 text-slate-400" />
-                              {b.customer?.email ?? "-"}
-                            </div>
-                            <div className="flex items-center gap-2 text-sm text-slate-700">
-                              <Phone className="w-4 h-4 text-slate-400" />
-                              {b.customer?.phoneNumber ?? "-"}
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-2">
-                            <Bed className="w-4 h-4 text-slate-400" />
-                            <span className="text-sm font-semibold text-slate-900">
-                              Room {b.room?.roomNumber ?? "N/A"}
-                            </span>
-                          </div>
-                        </td>
+
                         <td className="px-6 py-4">
                           <div className="space-y-1">
                             <div className="flex items-center gap-2 text-sm text-slate-700">
@@ -352,100 +304,6 @@ const AdminBookingsPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Mobile Card View */}
-            <div className="lg:hidden space-y-4">
-              {bookings.map((b) => (
-                <div
-                  key={b.id}
-                  className="bg-white rounded-2xl shadow-lg border border-slate-200 p-6"
-                >
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center text-white font-bold text-lg">
-                        {b.customer?.firstName?.[0] ?? "-"}
-                        {b.customer?.lastName?.[0] ?? "-"}
-                      </div>
-                      <div>
-                        <p className="font-bold text-slate-900">
-                          {b.customer?.firstName ?? "-"}{" "}
-                          {b.customer?.lastName ?? "-"}
-                        </p>
-                        <p className="text-sm text-slate-600">
-                          Booking #{b.id}
-                        </p>
-                      </div>
-                    </div>
-                    {getStatusBadge(b.status ?? "unknown")}
-                  </div>
-
-                  <div className="space-y-3 mb-4">
-                    <div className="flex items-center gap-2 text-sm text-slate-700">
-                      <Mail className="w-4 h-4 text-slate-400" />
-                      {b.customer?.email ?? "-"}
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-slate-700">
-                      <Phone className="w-4 h-4 text-slate-400" />
-                      {b.customer?.phoneNumber ?? "-"}
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-slate-700">
-                      <Bed className="w-4 h-4 text-slate-400" />
-                      <span className="font-semibold">
-                        Room {b.room?.roomNumber ?? "N/A"}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-slate-700">
-                      <Calendar className="w-4 h-4 text-green-500" />
-                      {b.checkInDate ? formatDate(b.checkInDate) : "-"} -{" "}
-                      {b.checkOutDate ? formatDate(b.checkOutDate) : "-"}
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <div className="flex items-center gap-2 text-sm text-slate-700">
-                        <Users className="w-4 h-4 text-slate-400" />
-                        {b.numberOfGuests ?? "-"} guests
-                      </div>
-                      <div className="flex items-center gap-1 text-sm font-bold text-slate-900">
-                        <DollarSign className="w-4 h-4 text-green-600" />
-                        {b.totalPrice ?? "-"}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex gap-2 pt-4 border-t border-slate-200">
-                    {updatingId === b.id ? (
-                      <div className="flex items-center justify-center w-full py-2">
-                        <Loader2 className="w-5 h-5 animate-spin text-blue-600" />
-                      </div>
-                    ) : (
-                      <>
-                        <button
-                          className="flex-1 px-4 py-2.5 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-colors font-semibold text-sm flex items-center justify-center gap-2"
-                          onClick={() => handleStatusChange(b.id, "CONFIRMED")}
-                        >
-                          <Check className="w-4 h-4" />
-                          Confirm
-                        </button>
-                        <button
-                          className="flex-1 px-4 py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors font-semibold text-sm flex items-center justify-center gap-2"
-                          onClick={() => handleStatusChange(b.id, "CHECKED_IN")}
-                        >
-                          <LogIn className="w-4 h-4" />
-                          Check-in
-                        </button>
-                        <button
-                          className="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-colors font-semibold text-sm flex items-center justify-center gap-2"
-                          onClick={() => handleStatusChange(b.id, "CANCELLED")}
-                        >
-                          <X className="w-4 h-4" />
-                          Cancel
-                        </button>
-                      </>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Pagination */}
             <div className="mt-6 bg-white rounded-2xl shadow-lg border border-slate-200 p-6">
               <div className="flex items-center justify-between">
                 <p className="text-sm text-slate-600">
