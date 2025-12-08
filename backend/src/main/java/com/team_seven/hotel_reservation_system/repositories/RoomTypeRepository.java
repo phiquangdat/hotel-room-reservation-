@@ -32,6 +32,7 @@ public interface RoomTypeRepository extends JpaRepository<RoomType, Long> {
     JOIN rt.hotel h
     WHERE h.city = :city
       AND rt.capacity >= :guestCapacity
+      AND r.status NOT IN ('BOOKED', 'MAINTENANCE', 'OCCUPIED')
       AND NOT EXISTS (
         SELECT 1 FROM Booking b
         WHERE b.room = r
