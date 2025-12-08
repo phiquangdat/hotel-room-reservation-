@@ -1,34 +1,92 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { createRoom } from "@/lib/actions";
+import { createRoom, fetchAllHotels, fetchAllRoomTypes } from "@/lib/actions";
 import { useAuthStore } from "@/lib/auth";
 import toast from "react-hot-toast";
-import { Loader2, ArrowLeft, Plus } from "lucide-react";
+import { Loader2, ArrowLeft, Plus, AlertTriangle } from "lucide-react";
 import Link from "next/link";
+
+interface Hotel {
+  id: number;
+  name: string;
+}
+
+interface RoomType {
+  id: number;
+  name: string;
+  hotelName: string;
+}
 
 export default function AddRoomPage() {
   const { token } = useAuthStore();
   const router = useRouter();
   const [isSaving, setIsSaving] = useState(false);
 
+  const [isFetchingData, setIsFetchingData] = useState(true);
+  const [availableHotels, setAvailableHotels] = useState<Hotel[]>([]);
+  const [allRoomTypes, setAllRoomTypes] = useState<RoomType[]>([]);
+
   const [form, setForm] = useState({
     roomNumber: "",
-    roomType: "Ocean View Suite",
-    hotel: "",
+    roomTypeName: "",
+    hotelName: "",
     status: "Available",
-    capacity: "2",
+    capacity: 2,
     description: "",
     imageUrl: "",
   });
 
-  const roomTypes = [
-    "Ocean View Suite",
-    "Standard Room",
-    "Cabin Suite",
-    "Executive Studio",
-  ];
   const statusOptions = ["Available", "Occupied", "Maintenance", "Booked"];
+
+  const filteredRoomTypes = allRoomTypes.filter(
+    (type) => type.hotelName === form.hotelName
+  );
+
+  useEffect(() => {
+    async function loadData() {
+      if (!token) {
+        setIsFetchingData(false);
+        return;
+      }
+
+      setIsFetchingData(true);
+      try {
+        const [hotels, types] = await Promise.all([
+          fetchAllHotels(),
+          fetchAllRoomTypes(token),
+        ]);
+
+        setAvailableHotels(hotels);
+        setAllRoomTypes(types);
+
+        if (hotels.length > 0) {
+          const defaultHotelName = hotels[0].name;
+
+          setForm((prev) => ({ ...prev, hotelName: defaultHotelName }));
+
+          const initialRoomType = types.find(
+            (t) => t.hotelName === defaultHotelName
+          );
+          if (initialRoomType) {
+            setForm((prev) => ({
+              ...prev,
+              roomTypeName: initialRoomType.name,
+            }));
+          }
+        } else if (types.length > 0) {
+          setForm((prev) => ({ ...prev, roomTypeName: types[0].name }));
+        }
+      } catch (error) {
+        toast.error(
+          "Failed to load required data. Check authentication/server."
+        );
+      } finally {
+        setIsFetchingData(false);
+      }
+    }
+    loadData();
+  }, [token]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,10 +97,33 @@ export default function AddRoomPage() {
       return;
     }
 
+    const selectedHotel = availableHotels.find(
+      (h) => h.name === form.hotelName
+    );
+    const selectedRoomType = allRoomTypes.find(
+      (t) => t.name === form.roomTypeName && t.hotelName === form.hotelName
+    );
+
+    if (!selectedHotel || !selectedRoomType) {
+      toast.error("Hotel or Room Type selection is invalid. Please try again.");
+      return;
+    }
+
     setIsSaving(true);
 
+    const payload = {
+      roomNumber: form.roomNumber,
+      roomTypeId: selectedRoomType.id,
+      roomTypeName: form.roomTypeName,
+      hotelName: form.hotelName,
+      status: form.status,
+      capacity: Number(form.capacity),
+      description: form.description,
+      imageUrl: form.imageUrl,
+    };
+
     try {
-      const result = await createRoom(form, token);
+      const result = await createRoom(payload, token);
 
       if (result.error) {
         toast.error(result.error);
@@ -57,6 +138,37 @@ export default function AddRoomPage() {
       setIsSaving(false);
     }
   };
+
+  if (isFetchingData) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
+        <p className="ml-3 text-gray-700">Loading required data...</p>
+      </div>
+    );
+  }
+
+  if (!token || availableHotels.length === 0) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <div className="text-center p-8 bg-white shadow-xl rounded-xl">
+          <AlertTriangle className="w-10 h-10 text-red-500 mx-auto mb-4" />
+          <h2 className="text-xl font-bold text-gray-800">
+            Cannot Load Room Data
+          </h2>
+          <p className="text-gray-600">
+            Please ensure you are logged in as Admin and Hotel data exists.
+          </p>
+          <button
+            onClick={() => router.push("/login")}
+            className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+          >
+            Go to Login
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 p-6">
@@ -106,14 +218,35 @@ export default function AddRoomPage() {
                 <label className="block text-sm font-bold text-gray-700 mb-2 tracking-wide uppercase text-xs">
                   Hotel Name <span className="text-red-500">*</span>
                 </label>
-                <input
-                  type="text"
-                  required
-                  value={form.hotel}
-                  onChange={(e) => setForm({ ...form, hotel: e.target.value })}
-                  className="text-gray-700 border-2 border-gray-200 rounded-xl w-full px-4 py-3.5 focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all outline-none bg-gray-50 focus:bg-white hover:border-gray-300"
-                  placeholder="e.g. Grand Plaza"
-                />
+                <div className="relative">
+                  <select
+                    required
+                    value={form.hotelName}
+                    onChange={(e) =>
+                      setForm({
+                        ...form,
+                        hotelName: e.target.value,
+                        roomTypeName:
+                          filteredRoomTypes.length > 0
+                            ? filteredRoomTypes[0].name
+                            : "",
+                      })
+                    }
+                    className="text-gray-700 border-2 border-gray-200 rounded-xl w-full px-4 py-3.5 focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all outline-none bg-gray-50 focus:bg-white hover:border-gray-300 appearance-none"
+                    disabled={availableHotels.length === 0}
+                  >
+                    {availableHotels.map((hotel) => (
+                      <option key={hotel.id} value={hotel.name}>
+                        {hotel.name}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
+                    <svg className="h-4 w-4 fill-current" viewBox="0 0 20 20">
+                      <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+                    </svg>
+                  </div>
+                </div>
               </div>
 
               <div>
@@ -122,17 +255,22 @@ export default function AddRoomPage() {
                 </label>
                 <div className="relative">
                   <select
-                    value={form.roomType}
+                    value={form.roomTypeName}
                     onChange={(e) =>
-                      setForm({ ...form, roomType: e.target.value })
+                      setForm({ ...form, roomTypeName: e.target.value })
                     }
                     className="text-gray-700 border-2 border-gray-200 rounded-xl w-full px-4 py-3.5 focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all outline-none bg-gray-50 focus:bg-white hover:border-gray-300 appearance-none"
+                    disabled={filteredRoomTypes.length === 0}
                   >
-                    {roomTypes.map((type) => (
-                      <option key={type} value={type}>
-                        {type}
-                      </option>
-                    ))}
+                    {filteredRoomTypes.length === 0 ? (
+                      <option value="">No Types for Selected Hotel</option>
+                    ) : (
+                      filteredRoomTypes.map((type) => (
+                        <option key={type.id} value={type.name}>
+                          {type.name}
+                        </option>
+                      ))
+                    )}
                   </select>
                   <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
                     <svg className="h-4 w-4 fill-current" viewBox="0 0 20 20">
@@ -178,7 +316,10 @@ export default function AddRoomPage() {
                   min="1"
                   value={form.capacity}
                   onChange={(e) =>
-                    setForm({ ...form, capacity: e.target.value })
+                    setForm({
+                      ...form,
+                      capacity: parseInt(e.target.value) || 0,
+                    })
                   }
                   className="text-gray-700 border-2 border-gray-200 rounded-xl w-full px-4 py-3.5 focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all outline-none bg-gray-50 focus:bg-white hover:border-gray-300"
                   placeholder="e.g. 2"
@@ -218,7 +359,9 @@ export default function AddRoomPage() {
             <div className="flex flex-col sm:flex-row gap-3 pt-6 border-t-2 border-gray-100">
               <button
                 type="submit"
-                disabled={isSaving}
+                disabled={
+                  isSaving || isFetchingData || availableHotels.length === 0
+                }
                 className="flex-1 bg-amber-600 text-white px-8 py-4 rounded-xl hover:from-indigo-700 hover:to-blue-700 font-bold transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isSaving ? (

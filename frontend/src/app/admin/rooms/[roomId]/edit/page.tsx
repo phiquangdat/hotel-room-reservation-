@@ -57,7 +57,7 @@ export default function EditRoomPage() {
         const [room, hotelList, roomTypeList] = await Promise.all([
           fetchRoomDetails(roomId as string),
           fetchAllHotels(),
-          fetchAllRoomTypes(),
+          fetchAllRoomTypes(token || ""),
         ]);
 
         setHotels(hotelList);
@@ -112,7 +112,6 @@ export default function EditRoomPage() {
     e.preventDefault();
     setIsSaving(true);
 
-    // --- 1. AUTHENTICATION CHECK (FIX) ---
     if (!isAuthenticated() || !token) {
       toast.error("Session expired. Please log in to update.");
       setIsSaving(false);
@@ -148,7 +147,6 @@ export default function EditRoomPage() {
         toast.error(result.error);
       } else {
         toast.success(`Room ${form.roomNumber} updated successfully`);
-        router.refresh();
         router.push("/admin/rooms");
         router.refresh();
       }

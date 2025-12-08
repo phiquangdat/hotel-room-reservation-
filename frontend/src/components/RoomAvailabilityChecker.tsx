@@ -54,7 +54,9 @@ const RoomAvailabilityChecker: React.FC = () => {
       const allRooms: RoomResult[] = await fetchAllRooms();
 
       const filteredRooms = allRooms.filter(
-        (room) => room.capacity >= guestCapacity
+        (room) =>
+          room.capacity >= guestCapacity &&
+          room.status?.toUpperCase() !== "BOOKED"
       );
 
       setRooms(filteredRooms);
@@ -100,7 +102,7 @@ const RoomAvailabilityChecker: React.FC = () => {
             value={guestCapacity}
             min="1"
             onChange={(e) => setGuestCapacity(parseInt(e.target.value) || 1)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
+            className="text-gray-700 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
             required
           />
         </div>

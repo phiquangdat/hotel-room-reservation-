@@ -286,10 +286,10 @@ export async function fetchAllRoomTypes(token?: string): Promise<RoomType[]> {
     return await res.json();
   } catch (error) {
     console.error("Failed to fetch room types:", error);
-    // If we failed due to auth/network, return empty array and let the UI show empty state/error
     return [];
   }
 }
+
 export async function fetchAllHotels(): Promise<Hotel[]> {
   try {
     const res = await fetch(`${backendUrl}/hotels`, { cache: "no-store" });
