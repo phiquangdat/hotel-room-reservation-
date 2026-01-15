@@ -9,6 +9,12 @@ make db/reset
 ```
 
 ---
+## Demo
+
+[![Watch the Demo](https://img.youtube.com/vi/eylVeSUtsbs/0.jpg)](https://youtu.be/eylVeSUtsbs)
+
+> Click the image above to watch the walkthrough on YouTube.
+---
 
 ## Overview
 
