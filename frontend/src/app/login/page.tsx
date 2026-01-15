@@ -37,9 +37,19 @@ export default function LoginPage() {
         body: JSON.stringify(form),
       });
 
-      const data = await res.json();
+      let data;
+      try {
+        const text = await res.text();
+        data = text ? JSON.parse(text) : {};
+      } catch (e) {
+        console.error("Failed to parse login response JSON:", e);
+        data = {};
+      }
 
-      if (!res.ok) throw new Error(data.message || "Login failed");
+      if (!res.ok) {
+        console.error("Login failed with status:", res.status, data);
+        throw new Error(data.message || `Login failed (${res.status})`);
+      }
       if (!data.token) throw new Error("Login response missing token");
 
       login(
@@ -134,7 +144,7 @@ export default function LoginPage() {
           </form>
 
           <div className="px-8 py-6 bg-gray-50 border-t border-gray-100 text-center text-sm text-gray-600">
-            Don't have an account?{" "}
+            Don&apos;t have an account?{" "}
             <Link
               href="/register"
               className="text-indigo-600 hover:text-indigo-700 font-semibold"

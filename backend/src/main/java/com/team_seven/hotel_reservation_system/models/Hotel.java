@@ -41,6 +41,9 @@ public class Hotel {
     @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
+    @Column(name = "image_url")
+    private String imageUrl;
+
     @Column(name = "rating", precision = 3, scale = 1)
     private BigDecimal rating;
 }

@@ -18,5 +18,6 @@ public class HotelDto {
     private String city;
     private String phoneNumber;
     private String description;
+    private String imageUrl;
     private BigDecimal rating;
 }

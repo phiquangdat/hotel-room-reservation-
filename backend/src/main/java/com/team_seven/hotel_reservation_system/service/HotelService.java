@@ -56,6 +56,7 @@ public class HotelService {
         hotel.setCity(dto.getCity());
         hotel.setPhoneNumber(dto.getPhoneNumber());
         hotel.setDescription(dto.getDescription());
+        hotel.setImageUrl(dto.getImageUrl());
         hotel.setRating(dto.getRating());
 
         Hotel saved = hotelRepository.save(hotel);
@@ -72,6 +73,7 @@ public class HotelService {
         hotel.setCity(dto.getCity());
         hotel.setPhoneNumber(dto.getPhoneNumber());
         hotel.setDescription(dto.getDescription());
+        hotel.setImageUrl(dto.getImageUrl());
         hotel.setRating(dto.getRating());
 
         Hotel updated = hotelRepository.save(hotel);
@@ -98,6 +100,7 @@ public class HotelService {
                     .city(h.getCity())
                     .phoneNumber(h.getPhoneNumber())
                     .description(h.getDescription())
+                    .imageUrl(h.getImageUrl())
                     .rating(h.getRating())
                     .build();
         } catch (Exception e) {

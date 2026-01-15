@@ -4,10 +4,6 @@
 docker compose up --build
 ```
 
-```bash
-make db/reset
-```
-
 ---
 ## Demo
 
